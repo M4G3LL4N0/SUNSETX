@@ -5,6 +5,11 @@ import { calculateScentScore } from "@/lib/scent"
 import { rankLocations } from "@/lib/rank"
 import { locations } from "@/lib/locations"
 import { getPeakWindow, formatTime } from "@/lib/timing"
+import dynamic from "next/dynamic"
+import Auth from "@/components/Auth"
+import Share from "@/components/Share"
+
+const Map = dynamic(() => import("@/components/Map"), { ssr: false })
 
 export default async function Home() {
   const lat = 37.485
@@ -54,24 +59,11 @@ export default async function Home() {
           ))}
         </div>
 
+        <Map locations={ranked} />
+        <Auth />
+        <Share />
+
       </div>
     </main>
   )
 }
-
-import dynamic from "next/dynamic"
-const Map = dynamic(() => import("@/components/Map"), { ssr: false })
-
-// Add this inside return (below list)
-<Map locations={ranked} />
-
-
-import Auth from "@/components/Auth"
-
-<Auth />
-
-
-import Share from "@/components/Share"
-
-<Share />
-
