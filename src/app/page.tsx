@@ -58,3 +58,20 @@ export default async function Home() {
     </main>
   )
 }
+
+import dynamic from "next/dynamic"
+const Map = dynamic(() => import("@/components/Map"), { ssr: false })
+
+// Add this inside return (below list)
+<Map locations={ranked} />
+
+
+import Auth from "@/components/Auth"
+
+<Auth />
+
+
+import Share from "@/components/Share"
+
+<Share />
+
