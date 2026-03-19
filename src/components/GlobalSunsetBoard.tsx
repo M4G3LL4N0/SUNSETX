@@ -115,7 +115,7 @@ export default function GlobalSunsetBoard() {
 
   return (
     <section className="mt-8 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-4 md:p-6 shadow-lg backdrop-blur-xl">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
         <div>
           <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">
             Global sunset board

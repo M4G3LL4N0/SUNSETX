@@ -268,8 +268,8 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
         </div>
       </div>
 
-      <div className="space-y-3">
-        <div className="text-[11px] uppercase tracking-[0.24em] text-zinc-500">
+      <div className="space-y-2">
+        <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">
           Top sunset spots
         </div>
         {report.spots.map((spot, index) => (
