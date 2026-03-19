@@ -1,22 +1,30 @@
-type WeatherInput = {
+type SunsetScoreInput = {
   clouds: number
   humidity: number
-  visibility: number
-  pollution?: number
+  visibilityMiles: number
+  windMph: number
+  sunElevation: number
+  afterglowScore: number
 }
 
-export function calculateSkyScore(weather: WeatherInput) {
-  const cloud = (weather.clouds ?? 40) / 100
-  const humidity = (weather.humidity ?? 55) / 100
-  const visibility = Math.min((weather.visibility ?? 10000) / 10000, 1)
-  const pollution = weather.pollution ?? 0.2
+export function calculateSkyScore(input: SunsetScoreInput) {
+  const cloudStructure = 1 - Math.abs(input.clouds / 100 - 0.45)
+  const humidityBalance = 1 - Math.abs(input.humidity / 100 - 0.55)
+  const visibilityScore = Math.min(input.visibilityMiles / 10, 1)
+  const windBalance = 1 - Math.min(Math.abs(input.windMph - 6) / 16, 1)
 
-  const score =
-    0.3 * (1 - Math.abs(cloud - 0.5)) +
-    0.2 * cloud +
-    0.2 * visibility +
-    0.15 * (1 - humidity) +
-    0.15 * (1 - pollution)
+  const goldenBand =
+    input.sunElevation <= 2 && input.sunElevation >= -8
+      ? 1
+      : Math.max(0, 1 - Math.abs(input.sunElevation + 2) / 10)
 
-  return Math.max(0, Math.min(100, Math.round(score * 100)))
+  const raw =
+    0.25 * cloudStructure +
+    0.14 * humidityBalance +
+    0.18 * visibilityScore +
+    0.08 * windBalance +
+    0.15 * goldenBand +
+    0.20 * (input.afterglowScore / 100)
+
+  return Math.max(0, Math.min(100, Math.round(raw * 100)))
 }

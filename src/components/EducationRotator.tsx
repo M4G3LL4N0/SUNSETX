@@ -70,16 +70,31 @@ const FACTS: FactCard[] = [
 
 export default function EducationRotator() {
   const [index, setIndex] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const [secondsRemaining, setSecondsRemaining] = useState(9)
 
   useEffect(() => {
-    const id = window.setInterval(() => {
-      setIndex((current) => (current + 1) % FACTS.length)
-    }, 9000)
+    if (paused) return
 
-    return () => window.clearInterval(id)
-  }, [])
+    const tick = window.setInterval(() => {
+      setSecondsRemaining((current) => {
+        if (current <= 1) {
+          setIndex((prev) => (prev + 1) % FACTS.length)
+          return 9
+        }
+        return current - 1
+      })
+    }, 1000)
+
+    return () => window.clearInterval(tick)
+  }, [paused])
 
   const current = useMemo(() => FACTS[index], [index])
+
+  const goTo = (nextIndex: number) => {
+    setIndex(nextIndex)
+    setSecondsRemaining(9)
+  }
 
   return (
     <section className="mt-8 rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-2xl">
@@ -93,9 +108,13 @@ export default function EducationRotator() {
           </h2>
         </div>
 
-        <div className="rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs text-zinc-400">
-          Rotates every ~9 sec
-        </div>
+        <button
+          type="button"
+          onClick={() => setPaused((value) => !value)}
+          className="rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs text-zinc-400"
+        >
+          {paused ? "Resume" : `Next in ${secondsRemaining}s`}
+        </button>
       </div>
 
       <div className="mt-6 rounded-3xl border border-white/10 bg-black/30 p-6">
@@ -119,7 +138,7 @@ export default function EducationRotator() {
           <button
             key={fact.title}
             type="button"
-            onClick={() => setIndex(factIndex)}
+            onClick={() => goTo(factIndex)}
             className={`h-2.5 w-10 rounded-full transition ${
               factIndex === index ? "bg-white" : "bg-white/15 hover:bg-white/25"
             }`}

@@ -1,3 +1,7 @@
+"use client"
+
+import { useEffect, useState } from "react"
+
 type RankedSunset = {
   city: string
   country: string
@@ -6,77 +10,12 @@ type RankedSunset = {
   window: string
 }
 
-const TODAY: RankedSunset[] = [
-  {
-    city: "Santorini",
-    country: "Greece",
-    score: 96,
-    window: "Today",
-    why: "Layered high clouds, open sea horizon, and strong afterglow potential.",
-  },
-  {
-    city: "Maui",
-    country: "United States",
-    score: 94,
-    window: "Today",
-    why: "Clear western ocean line with balanced cloud texture and clean visibility.",
-  },
-  {
-    city: "Cape Town",
-    country: "South Africa",
-    score: 93,
-    window: "Today",
-    why: "Wide coastal horizon, dramatic sky structure, and strong late color carry.",
-  },
-]
-
-const TOMORROW: RankedSunset[] = [
-  {
-    city: "Honolulu",
-    country: "United States",
-    score: 95,
-    window: "Tomorrow",
-    why: "Excellent horizon openness with light cloud layering and reflective water.",
-  },
-  {
-    city: "Lisbon",
-    country: "Portugal",
-    score: 92,
-    window: "Tomorrow",
-    why: "Good atmospheric clarity and mid-cloud structure without heavy blockage.",
-  },
-  {
-    city: "Sydney",
-    country: "Australia",
-    score: 91,
-    window: "Tomorrow",
-    why: "Balanced cloud pattern with broad harbor exposure and strong warm tones.",
-  },
-]
-
-const THIS_WEEK: RankedSunset[] = [
-  {
-    city: "Malibu",
-    country: "United States",
-    score: 97,
-    window: "This week",
-    why: "High-upside coastal horizon with layered cloud windows and vivid afterglow setup.",
-  },
-  {
-    city: "Ibiza",
-    country: "Spain",
-    score: 95,
-    window: "This week",
-    why: "Open water, strong horizon access, and repeated favorable evening structure.",
-  },
-  {
-    city: "Bali",
-    country: "Indonesia",
-    score: 94,
-    window: "This week",
-    why: "Consistent tropical color potential with reflective water and broad viewing angles.",
-  },
-]
+type BoardResponse = {
+  updatedAt: string
+  today: RankedSunset[]
+  tomorrow: RankedSunset[]
+  week: RankedSunset[]
+}
 
 function Section({
   title,
@@ -123,6 +62,34 @@ function Section({
 }
 
 export default function GlobalSunsetBoard() {
+  const [board, setBoard] = useState<BoardResponse | null>(null)
+
+  useEffect(() => {
+    let active = true
+
+    const load = async () => {
+      const res = await fetch("/api/global-sunset-board", { cache: "no-store" })
+      const data = (await res.json()) as BoardResponse
+      if (active) setBoard(data)
+    }
+
+    load()
+    const id = window.setInterval(load, 60000)
+
+    return () => {
+      active = false
+      window.clearInterval(id)
+    }
+  }, [])
+
+  if (!board) {
+    return (
+      <section className="mt-8 rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-2xl">
+        <div className="text-sm text-zinc-400">Loading global sunset board…</div>
+      </section>
+    )
+  }
+
   return (
     <section className="mt-8 rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-2xl">
       <div className="flex items-end justify-between gap-4">
@@ -136,14 +103,14 @@ export default function GlobalSunsetBoard() {
         </div>
 
         <div className="rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs text-zinc-400">
-          Demo ranking widget for homepage preview
+          Updated {new Date(board.updatedAt).toLocaleTimeString()}
         </div>
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <Section title="Today" items={TODAY} />
-        <Section title="Tomorrow" items={TOMORROW} />
-        <Section title="This week" items={THIS_WEEK} />
+        <Section title="Today" items={board.today} />
+        <Section title="Tomorrow" items={board.tomorrow} />
+        <Section title="This week" items={board.week} />
       </div>
     </section>
   )

@@ -1,9 +1,12 @@
 export function getPeakWindow(sunsetISO: string) {
-  // JS Date automatically converts ISO UTC → local time
-  const sunset = new Date(sunsetISO)
+  // Convert UTC → local time
+  const sunsetUTC = new Date(sunsetISO)
+  const sunsetLocal = new Date(
+    sunsetUTC.toLocaleString("en-US", { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone })
+  )
 
-  const peakStart = new Date(sunset.getTime() - 2 * 60 * 1000)
-  const peakEnd = new Date(sunset.getTime() + 6 * 60 * 1000)
+  const peakStart = new Date(sunsetLocal.getTime() - 2 * 60 * 1000)
+  const peakEnd = new Date(sunsetLocal.getTime() + 6 * 60 * 1000)
 
   return { peakStart, peakEnd }
 }
