@@ -151,21 +151,24 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
   if (!report) return null
 
   return (
-    <section className="mt-4 space-y-4">
-      <Card>
-        <div className="flex items-baseline gap-3">
-          <div className="text-4xl font-bold tracking-tight">{report.summary.score}</div>
-          <div className="flex-1 space-y-2">
-            <div className="text-xl font-semibold">{report.header.title}</div>
-            <div className="flex flex-wrap gap-2">
+    <section className="mt-4 space-y-2">
+      <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/10 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">Tonight's Report</div>
+            <div className="text-xl font-medium text-white mb-2">{report.header.title}</div>
+            <div className="flex flex-wrap gap-1.5">
               <Chip>{report.summary.rating}</Chip>
               <Chip>Worth it: {report.summary.worthIt}</Chip>
               <Chip>{report.header.regionLabel}</Chip>
             </div>
           </div>
+          <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-100 to-fuchsia-100">
+            {report.summary.score}
+          </div>
         </div>
-        <p className="mt-4 text-sm leading-6 text-zinc-300">{report.header.intro}</p>
-      </Card>
+        <p className="mt-3 text-sm leading-6 text-zinc-400">{report.header.intro}</p>
+      </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         <Card title="Golden Hour">
