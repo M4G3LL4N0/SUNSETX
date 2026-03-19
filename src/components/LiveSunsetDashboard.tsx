@@ -110,9 +110,7 @@ export default function LiveSunsetDashboard() {
         const json = (await res.json()) as ApiResponse
         if (active) setData(json)
       } catch (e) {
-        if (active) {
-          setError(e instanceof Error ? e.message : "Failed to load")
-        }
+        if (active) setError(e instanceof Error ? e.message : "Failed to load")
       }
     }
 
@@ -162,7 +160,7 @@ export default function LiveSunsetDashboard() {
           </p>
 
           <div className="mt-4 text-sm text-zinc-500">
-            {status} · {data.timezone} · local time {data.currentLocalTime}
+            {status} · {data.timezone} · updated {new Date(data.updatedAt).toLocaleTimeString()}
           </div>
         </div>
 
