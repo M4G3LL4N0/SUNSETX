@@ -68,7 +68,7 @@ type Report = {
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full border border-white/10 bg-white/10 px-2.5 py-1 text-[11px] font-medium text-zinc-200">
+    <span className="rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-[11px] font-medium text-zinc-300">
       {children}
     </span>
   )
@@ -85,37 +85,37 @@ function Card({
 }) {
   return (
     <div
-      className={`rounded-[24px] border border-white/10 bg-white/[0.06] p-4 backdrop-blur-2xl ${className}`}
+      className={`rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-3 shadow-lg backdrop-blur-xl ${className}`}
     >
       {title ? (
-        <div className="text-[11px] uppercase tracking-[0.22em] text-zinc-400">
+        <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">
           {title}
         </div>
       ) : null}
-      <div className={title ? "mt-4" : ""}>{children}</div>
+      <div>{children}</div>
     </div>
   )
 }
 
 function SpotCard({ spot, index }: { spot: Spot; index: number }) {
   return (
-    <div className="rounded-[24px] border border-white/10 bg-white/[0.06] p-4 backdrop-blur-2xl">
-      <div className="flex items-start justify-between gap-3">
+    <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/5 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="text-xs text-zinc-500">Spot #{index + 1}</div>
-          <div className="mt-1 text-lg font-semibold tracking-tight">{spot.name}</div>
-          <div className="mt-1 text-xs leading-5 text-zinc-400">{spot.address}</div>
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Spot #{index + 1}</div>
+          <div className="text-xl font-medium text-white mb-1">{spot.name}</div>
+          <div className="text-sm text-zinc-400">{spot.address}</div>
         </div>
 
-        <div className="rounded-[18px] border border-white/10 bg-white/10 px-3 py-2 text-right">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-            Score
+        <div className="text-right">
+          <div className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-100 to-fuchsia-100">
+            {spot.score}
           </div>
-          <div className="mt-1 text-lg font-bold">{spot.score} 🔥</div>
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mt-1">Score</div>
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-3 flex flex-wrap gap-1.5">
         <Chip>{spot.distanceMiles} mi</Chip>
         <Chip>~{spot.driveMinutes} min</Chip>
         <Chip>{spot.smellLabel}</Chip>
@@ -123,28 +123,25 @@ function SpotCard({ spot, index }: { spot: Spot; index: number }) {
         <Chip>{spot.vibeLabel}</Chip>
       </div>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">Panorama</div>
-          <div className="mt-2 text-xs leading-5 text-zinc-300">{spot.panoramaLabel}</div>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">Ease</div>
-          <div className="mt-2 text-xs leading-5 text-zinc-300">{spot.easeLabel}</div>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">Best for</div>
-          <div className="mt-2 text-xs leading-5 text-zinc-300">{spot.bestFor}</div>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">Water risk</div>
-          <div className="mt-2 text-xs leading-5 text-zinc-300">{spot.waterLabel}</div>
-        </div>
+      <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+        <Card title="Panorama">
+          <div className="text-sm leading-5 text-zinc-300">{spot.panoramaLabel}</div>
+        </Card>
+        <Card title="Ease">
+          <div className="text-sm leading-5 text-zinc-300">{spot.easeLabel}</div>
+        </Card>
+        <Card title="Best for">
+          <div className="text-sm leading-5 text-zinc-300">{spot.bestFor}</div>
+        </Card>
+        <Card title="Water risk">
+          <div className="text-sm leading-5 text-zinc-300">{spot.waterLabel}</div>
+        </Card>
       </div>
 
-      <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.04] p-3">
-        <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">Why it wins</div>
-        <div className="mt-2 text-xs leading-5 text-zinc-300">{spot.whyItWins}</div>
+      <div className="mt-2">
+        <Card title="Why it wins">
+          <div className="text-sm leading-5 text-zinc-300">{spot.whyItWins}</div>
+        </Card>
       </div>
     </div>
   )
