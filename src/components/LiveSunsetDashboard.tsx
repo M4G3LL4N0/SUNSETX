@@ -25,6 +25,7 @@ type ApiResponse = {
   }
   nearbyRankedLocations: Array<any>
   aiNarrative?: any
+  aiStatus?: "live" | "fallback"
   updatedAt: string
 }
 
@@ -148,8 +149,16 @@ export default function LiveSunsetDashboard() {
           </p>
         </div>
 
-        <div className="rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm text-zinc-400">
-          {status} · updated {new Date(data.updatedAt).toLocaleTimeString()}
+        <div className="flex flex-wrap gap-2">
+          <span className="rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm text-zinc-400">
+            {status}
+          </span>
+          <span className="rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm text-zinc-400">
+            AI: {data.aiStatus === "live" ? "live" : "fallback"}
+          </span>
+          <span className="rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm text-zinc-400">
+            Updated {new Date(data.updatedAt).toLocaleTimeString()}
+          </span>
         </div>
       </div>
 

@@ -194,6 +194,7 @@ export async function GET(req: Request) {
         nearbyRankedLocations: closestSpots,
         elevationCurve: buildSunElevationCurve(sunsetDate, lat, lon, 45, 45, 5),
         aiNarrative,
+        aiStatus: aiNarrative ? "live" : "fallback",
         updatedAt: new Date().toISOString(),
       },
       {
@@ -209,7 +210,7 @@ export async function GET(req: Request) {
     return Response.json(
       {
         error: message,
-        hint: "Check OPENWEATHER_API_KEY, OPENAI_API_KEY, and route dependencies.",
+        hint: "Check OPENWEATHER_API_KEY and route dependencies.",
       },
       { status: 500 }
     )
