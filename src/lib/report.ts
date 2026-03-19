@@ -36,7 +36,9 @@ type LiveScorePayload = {
     sunElevation: number
     summary: string
   }
-  nearbyRankedLocations: Spot[]
+  closeSpots: Spot[]
+  midRangeSpot: Spot | null
+  premiumSpot: Spot | null
   aiNarrative?: {
     title?: string
     intro?: string
@@ -91,8 +93,13 @@ function buildSummaryBullets(score: number) {
 }
 
 export function generateSunsetReport(data: LiveScorePayload) {
-  const spots = (data.nearbyRankedLocations ?? []).slice(0, 3)
-  const bestSpot = spots[0]
+  const allSpots = [
+    ...data.closeSpots,
+    ...(data.midRangeSpot ? [data.midRangeSpot] : []),
+    ...(data.premiumSpot ? [data.premiumSpot] : []),
+  ].filter(Boolean) as Spot[]
+
+  const bestSpot = data.closeSpots[0] || data.midRangeSpot || data.premiumSpot
 
   return {
     header: {
@@ -127,7 +134,7 @@ export function generateSunsetReport(data: LiveScorePayload) {
     whyTonightIsGood: {
       cloudStructure:
         data.aiNarrative?.whyTonightIsGood?.cloudStructure ??
-        "Useful cloud structure can catch warm light without fully blocking the horizon.",
+        "Useful cloud structure can help catch warm light without fully blocking the horizon.",
       atmosphere:
         data.aiNarrative?.whyTonightIsGood?.atmosphere ??
         "Current visibility and air balance support cleaner color and readable gradients.",
@@ -162,7 +169,7 @@ export function generateSunsetReport(data: LiveScorePayload) {
             "Leaving late and missing the real peak",
           ],
 
-    spots,
+    spots: allSpots,
 
     decision: {
       goNoGo:

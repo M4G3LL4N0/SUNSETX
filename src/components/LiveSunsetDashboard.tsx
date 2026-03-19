@@ -46,7 +46,9 @@ type ApiResponse = {
     sunElevation: number
     summary: string
   }
-  nearbyRankedLocations: NearbySpot[]
+  closeSpots: NearbySpot[]
+  midRangeSpot: NearbySpot | null
+  premiumSpot: NearbySpot | null
   aiNarrative?: {
     title?: string
     intro?: string
@@ -106,7 +108,7 @@ function buildEmergencyData(): ApiResponse {
       sunElevation: -1.8,
       summary: "partly cloudy",
     },
-    nearbyRankedLocations: [
+    closeSpots: [
       {
         id: "junipero-serra-park",
         name: "Junipero Serra Park",
@@ -162,6 +164,42 @@ function buildEmergencyData(): ApiResponse {
         driveMinutes: 8,
       },
     ],
+    midRangeSpot: {
+      id: "crystal-springs-overlook",
+      name: "Crystal Springs Overlook",
+      address: "2600 Skyline Blvd, Burlingame, CA 94010",
+      score: 86,
+      spotScore: 86,
+      scent: 0.9,
+      smellLabel: "eucalyptus, grass, cool hillside air",
+      parkingLabel: "Moderate",
+      vibeLabel: "Scenic, elevated, breezy",
+      bestFor: "panoramic hillside sunset",
+      whyItWins: "Strong elevation and fresh hillside air support a premium sunset feel.",
+      panoramaLabel: "Wide scenic overlook",
+      easeLabel: "Easy to moderate",
+      waterLabel: "Low water smell risk",
+      distanceMiles: 6.2,
+      driveMinutes: 16,
+    },
+    premiumSpot: {
+      id: "edgewood-park",
+      name: "Edgewood Park",
+      address: "1600 Edgewood Rd, Redwood City, CA 94062",
+      score: 90,
+      spotScore: 90,
+      scent: 0.95,
+      smellLabel: "oak woodland, dry grass, clean nature",
+      parkingLabel: "Easy",
+      vibeLabel: "Calm, woodsy, scenic",
+      bestFor: "clean smell, low friction, natural vibe",
+      whyItWins: "Excellent woodsy scent profile with meadow openness and clean air.",
+      panoramaLabel: "Meadow + hillside opening",
+      easeLabel: "Easy",
+      waterLabel: "Very low water smell risk",
+      distanceMiles: 12.4,
+      driveMinutes: 22,
+    },
     aiNarrative: {
       title: "SUNSETX REPORT — YOUR AREA",
       intro:
@@ -323,7 +361,7 @@ export default function LiveSunsetDashboard() {
   const report = useMemo(() => (data ? generateSunsetReport(data) : null), [data])
 
   const leaveNow = useMemo(() => {
-    const top = data?.nearbyRankedLocations?.[0]
+    const top = data?.closeSpots?.[0] || data?.midRangeSpot || data?.premiumSpot
     if (!top || !data) return null
 
     return getLeaveNowStatus({
@@ -332,7 +370,7 @@ export default function LiveSunsetDashboard() {
     })
   }, [data])
 
-  const topSpot = data?.nearbyRankedLocations?.[0]
+  const topSpot = data?.closeSpots?.[0] || data?.midRangeSpot || data?.premiumSpot
 
   if (!data || !report) {
     return (
@@ -349,7 +387,9 @@ export default function LiveSunsetDashboard() {
         <Pill>Lat: {coords.lat}</Pill>
         <Pill>Lon: {coords.lon}</Pill>
         <Pill>{fallbackMode ? "Fallback Mode" : "Live GPS Active"}</Pill>
-        <Pill>Spots: {data.nearbyRankedLocations.length}</Pill>
+        <Pill>Close: {data.closeSpots.length}</Pill>
+        <Pill>Mid: {data.midRangeSpot ? 1 : 0}</Pill>
+        <Pill>Premium: {data.premiumSpot ? 1 : 0}</Pill>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
@@ -403,7 +443,7 @@ export default function LiveSunsetDashboard() {
       </div>
 
       <div className="mt-5 grid gap-3 lg:grid-cols-3">
-        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
+        <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-xl">
           <div className="text-sm font-medium text-zinc-100">Leave-now engine</div>
           <div className="mt-2 text-sm text-zinc-300">
             {leaveNow?.copy ?? "Leave timing unavailable."}
@@ -422,7 +462,7 @@ export default function LiveSunsetDashboard() {
           timezoneOffset={data.timezoneOffset}
         />
 
-        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
+        <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-xl">
           <div className="text-sm font-medium text-zinc-100">Share</div>
           <div className="mt-2 text-sm text-zinc-300">
             Create a live sunset share card from your current report.

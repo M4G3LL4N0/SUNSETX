@@ -97,12 +97,19 @@ function Card({
   )
 }
 
-function SpotCard({ spot, index }: { spot: Spot; index: number }) {
+function SpotCard({ spot, index, label }: { spot: Spot; index: number; label?: string }) {
   return (
     <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/5 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Spot #{index + 1}</div>
+          {label && (
+            <div className="text-[10px] uppercase tracking-wider text-zinc-500 mb-1.5">
+              {label}
+            </div>
+          )}
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">
+            Spot #{index + 1}
+          </div>
           <div className="text-xl font-medium text-white mb-1">{spot.name}</div>
           <div className="text-sm text-zinc-400">{spot.address}</div>
         </div>
@@ -149,6 +156,11 @@ function SpotCard({ spot, index }: { spot: Spot; index: number }) {
 
 export default function SunsetReportWidget({ report }: { report: Report | null }) {
   if (!report) return null
+
+  // Categorize spots for display
+  const closeSpots = report.spots.slice(0, 3)
+  const midRangeSpot = report.spots[3] || null
+  const premiumSpot = report.spots[4] || null
 
   return (
     <section className="mt-4 space-y-2">
@@ -254,14 +266,37 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
         </div>
       </div>
 
-      <div className="space-y-2">
-        <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">
-          Top sunset spots
+      {/* Close Spots Section */}
+      {closeSpots.length > 0 && (
+        <div className="space-y-2">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">
+            Nearby spots (5–15 min)
+          </div>
+          {closeSpots.map((spot, index) => (
+            <SpotCard key={`${spot.name}-${index}`} spot={spot} index={index} />
+          ))}
         </div>
-        {report.spots.map((spot, index) => (
-          <SpotCard key={`${spot.name}-${index}`} spot={spot} index={index} />
-        ))}
-      </div>
+      )}
+
+      {/* Mid-Range Spot Section */}
+      {midRangeSpot && (
+        <div className="space-y-2">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">
+            Worth the drive (~30 min)
+          </div>
+          <SpotCard spot={midRangeSpot} index={0} label="Premium option" />
+        </div>
+      )}
+
+      {/* Premium Spot Section */}
+      {premiumSpot && (
+        <div className="space-y-2">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">
+            Best in region (~1 hour)
+          </div>
+          <SpotCard spot={premiumSpot} index={0} label="Destination spot" />
+        </div>
+      )}
 
       <div className="grid gap-2 md:grid-cols-2">
         <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/5 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">

@@ -26,13 +26,45 @@ function mphFromMs(ms?: number) {
 }
 
 function inferCityLabel(lat: number, lon: number) {
-  if (lat > 37.58 && lat < 37.63 && lon < -122.35 && lon > -122.42) return "Millbrae, CA"
-  if (lat > 37.45 && lat < 37.51 && lon < -122.21 && lon > -122.29) return "Redwood City, CA"
+  // Bay Area detection
+  if (lat > 37.4 && lat < 38 && lon > -122.6 && lon < -121.5) {
+    if (lat > 37.58 && lat < 37.63 && lon < -122.35 && lon > -122.42) return "Millbrae, CA"
+    if (lat > 37.45 && lat < 37.51 && lon < -122.21 && lon > -122.29) return "Redwood City, CA"
+    if (lat > 37.7 && lat < 37.8 && lon < -122.4 && lon > -122.5) return "San Francisco, CA"
+    return "Bay Area, CA"
+  }
+  
+  // Los Angeles detection
+  if (lat > 33.8 && lat < 34.2 && lon > -118.5 && lon < -117.5) {
+    return "Los Angeles, CA"
+  }
+  
+  // New York detection
+  if (lat > 40.5 && lat < 41.0 && lon > -74.3 && lon < -73.7) {
+    return "New York, NY"
+  }
+  
   return "Your Area"
 }
 
-function inferRegionLabel() {
-  return "Peninsula / South San Francisco Bay"
+function inferRegionLabel(lat: number, lon: number) {
+  // Bay Area regions
+  if (lat > 37.4 && lat < 37.7 && lon < -122.2 && lon > -122.5) {
+    return "Peninsula / South San Francisco Bay"
+  }
+  if (lat > 37.7 && lat < 38.0 && lon < -122.4 && lon > -122.5) {
+    return "San Francisco"
+  }
+  if (lat > 37.8 && lat < 38.2 && lon < -122.1 && lon > -121.5) {
+    return "East Bay"
+  }
+  
+  // Los Angeles regions
+  if (lat > 33.8 && lat < 34.2 && lon > -118.5 && lon < -117.5) {
+    return "Los Angeles Basin"
+  }
+  
+  return "Your Region"
 }
 
 function buildExplanation(input: {
@@ -173,16 +205,21 @@ export async function GET(req: Request) {
       afterglowScore,
     })
 
-    const baseSpots = getClosestRankedSpots(lat, lon, locations, skyScore)
-    const closestSpots = baseSpots
-      .map((spot) => ({
-        ...spot,
-        score: personalizeSpotScore(spot, prefs),
-      }))
-      .sort((a, b) => b.score - a.score)
+    // Get categorized spots
+    const spotGroups = getClosestRankedSpots(lat, lon, locations, skyScore)
+    
+    // Personalize the scores for all spot groups
+    const personalizeSpot = (spot: any) => spot ? {
+      ...spot,
+      score: personalizeSpotScore(spot, prefs),
+    } : null
+
+    const closeSpots = spotGroups.closeSpots.map(personalizeSpot)
+    const midRangeSpot = personalizeSpot(spotGroups.midRangeSpot)
+    const premiumSpot = personalizeSpot(spotGroups.premiumSpot)
 
     const cityLabel = inferCityLabel(lat, lon)
-    const regionLabel = inferRegionLabel()
+    const regionLabel = inferRegionLabel(lat, lon)
 
     const explanation = buildExplanation({
       clouds: current.clouds?.all ?? 40,
@@ -198,7 +235,7 @@ export async function GET(req: Request) {
       peakStart: formatWithOffset(peakStartDate, timezoneOffset),
       peakEnd: formatWithOffset(peakEndDate, timezoneOffset),
       explanation,
-      topSpotName: closestSpots[0]?.name,
+      topSpotName: closeSpots[0]?.name,
     })
 
     return Response.json(
@@ -224,10 +261,12 @@ export async function GET(req: Request) {
           sunElevation: Number(sunElevation.toFixed(2)),
           summary: current.weather?.[0]?.description ?? "unknown",
         },
-        nearbyRankedLocations: closestSpots,
+        closeSpots,
+        midRangeSpot,
+        premiumSpot,
         elevationCurve: buildSunElevationCurve(sunsetDate, lat, lon, 45, 45, 5),
         aiNarrative,
-        aiStatus: "fallback",
+        aiStatus: "live",
         updatedAt: new Date().toISOString(),
       },
       {

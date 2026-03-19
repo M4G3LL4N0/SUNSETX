@@ -38,7 +38,7 @@ export function getClosestRankedSpots(
   spots: SunsetSpot[],
   skyScore: number
 ) {
-  return spots
+  const scoredSpots = spots
     .map((spot) => {
       const distanceMiles = haversineMiles(userLat, userLon, spot.lat, spot.lon)
       const driveMinutes = estimateDriveMinutes(distanceMiles)
@@ -68,5 +68,33 @@ export function getClosestRankedSpots(
       }
     })
     .sort((a, b) => a.distanceMiles - b.distanceMiles || b.score - a.score)
+
+  // Group A: Close spots (5-15 min drive, top 3 by score)
+  const closeSpots = scoredSpots
+    .filter(spot => spot.driveMinutes <= 15)
     .slice(0, 3)
+
+  // Group B: Mid-range spot (~30 min, worth the drive)
+  const midRangeSpot = scoredSpots
+    .filter(spot => 
+      spot.driveMinutes > 15 && 
+      spot.driveMinutes <= 35 &&
+      !closeSpots.some(cs => cs.id === spot.id)
+    )
+    .slice(0, 1)
+
+  // Group C: Premium best-in-region spot (~1 hour or highest quality)
+  const premiumSpot = scoredSpots
+    .filter(spot => 
+      !closeSpots.some(cs => cs.id === spot.id) &&
+      !midRangeSpot.some(ms => ms.id === spot.id)
+    )
+    .slice(0, 1)
+
+  return {
+    closeSpots,
+    midRangeSpot: midRangeSpot[0] || null,
+    premiumSpot: premiumSpot[0] || null,
+    allSpots: scoredSpots,
+  }
 }
