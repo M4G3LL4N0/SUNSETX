@@ -1,7 +1,8 @@
 import {
-  getOneCallWeather,
+  getCurrentWeather,
+  getForecastWeather,
   unixSecondsToDate,
-  formatInTimeZone,
+  formatWithOffset,
 } from "@/lib/openweather"
 import {
   buildSunElevationCurve,
@@ -67,107 +68,124 @@ function buildExplanation(input: {
 }
 
 export async function GET(req: Request) {
-  const url = new URL(req.url)
-  const lat = Number(url.searchParams.get("lat") ?? "37.485")
-  const lon = Number(url.searchParams.get("lon") ?? "-122.23")
+  try {
+    const url = new URL(req.url)
+    const lat = Number(url.searchParams.get("lat") ?? "37.485")
+    const lon = Number(url.searchParams.get("lon") ?? "-122.23")
 
-  const data = await getOneCallWeather(lat, lon)
+    const current = await getCurrentWeather(lat, lon)
+    const forecast = await getForecastWeather(lat, lon)
 
-  const timezone = data.timezone ?? "America/Los_Angeles"
-  const current = data.current
-  const hourly = data.hourly ?? []
+    const timezoneOffset = current.timezone ?? forecast.city?.timezone ?? -25200
+    const sunsetUnix = current.sys?.sunset ?? forecast.city?.sunset
+    const currentUnix = current.dt
 
-  if (!current?.sunset || !current?.dt) {
-    return Response.json({ error: "Missing sunset data" }, { status: 500 })
-  }
+    if (!sunsetUnix || !currentUnix) {
+      return Response.json(
+        { error: "Missing sunset data from weather provider" },
+        { status: 500 }
+      )
+    }
 
-  const sunsetDate = unixSecondsToDate(current.sunset)
-  const currentDate = unixSecondsToDate(current.dt)
+    const sunsetDate = unixSecondsToDate(sunsetUnix)
+    const currentDate = unixSecondsToDate(currentUnix)
 
-  const peakStartDate = new Date(sunsetDate.getTime() - 2 * 60 * 1000)
-  const peakEndDate = new Date(sunsetDate.getTime() + 8 * 60 * 1000)
+    const peakStartDate = new Date(sunsetDate.getTime() - 2 * 60 * 1000)
+    const peakEndDate = new Date(sunsetDate.getTime() + 8 * 60 * 1000)
 
-  const sunElevation = getSolarElevation(currentDate, lat, lon)
-  const visibilityMiles = milesFromMeters(current.visibility)
-  const windMph = mphFromMs(current.wind_speed)
+    const sunElevation = getSolarElevation(currentDate, lat, lon)
+    const visibilityMiles = milesFromMeters(current.visibility)
+    const windMph = mphFromMs(current.wind?.speed)
 
-  const afterglowScore = estimateAfterglowScore({
-    clouds: current.clouds ?? 40,
-    humidity: current.humidity ?? 55,
-    visibilityMiles,
-    sunElevation,
-  })
-
-  const skyScore = calculateSkyScore({
-    clouds: current.clouds ?? 40,
-    humidity: current.humidity ?? 55,
-    visibilityMiles,
-    windMph,
-    sunElevation,
-    afterglowScore,
-  })
-
-  const ranked = rankLocations(locations, skyScore)
-  const curve = buildSunElevationCurve(sunsetDate, lat, lon, 45, 45, 5)
-
-  const nextHours = hourly.slice(0, 6).map((h) => {
-    const d = unixSecondsToDate(h.dt)
-    const elevation = getSolarElevation(d, lat, lon)
-    const visMiles = milesFromMeters(h.visibility)
-    const hourAfterglow = estimateAfterglowScore({
-      clouds: h.clouds ?? 40,
-      humidity: h.humidity ?? 55,
-      visibilityMiles: visMiles,
-      sunElevation: elevation,
+    const afterglowScore = estimateAfterglowScore({
+      clouds: current.clouds?.all ?? 40,
+      humidity: current.main?.humidity ?? 55,
+      visibilityMiles,
+      sunElevation,
     })
 
-    return {
-      localTime: formatInTimeZone(d, timezone),
-      clouds: h.clouds ?? 40,
-      humidity: h.humidity ?? 55,
-      visibilityMiles: visMiles,
-      windMph: mphFromMs(h.wind_speed),
-      elevation: Number(elevation.toFixed(2)),
-      afterglowScore: hourAfterglow,
-    }
-  })
-
-  return Response.json(
-    {
-      lat,
-      lon,
-      timezone,
-      currentLocalTime: formatInTimeZone(currentDate, timezone),
-      sunsetLocalTime: formatInTimeZone(sunsetDate, timezone),
-      peakWindow: {
-        start: formatInTimeZone(peakStartDate, timezone),
-        end: formatInTimeZone(peakEndDate, timezone),
-      },
-      skyScore,
+    const skyScore = calculateSkyScore({
+      clouds: current.clouds?.all ?? 40,
+      humidity: current.main?.humidity ?? 55,
+      visibilityMiles,
+      windMph,
+      sunElevation,
       afterglowScore,
-      explanation: buildExplanation({
-        clouds: current.clouds ?? 40,
-        humidity: current.humidity ?? 55,
-        visibilityMiles,
+    })
+
+    const ranked = rankLocations(locations, skyScore)
+    const curve = buildSunElevationCurve(sunsetDate, lat, lon, 45, 45, 5)
+
+    const nextHours = (forecast.list ?? []).slice(0, 6).map((h) => {
+      const d = unixSecondsToDate(h.dt)
+      const elevation = getSolarElevation(d, lat, lon)
+      const visMiles = milesFromMeters(h.visibility)
+      const hourAfterglow = estimateAfterglowScore({
+        clouds: h.clouds?.all ?? 40,
+        humidity: h.main?.humidity ?? 55,
+        visibilityMiles: visMiles,
+        sunElevation: elevation,
+      })
+
+      return {
+        localTime: formatWithOffset(d, timezoneOffset),
+        clouds: h.clouds?.all ?? 40,
+        humidity: h.main?.humidity ?? 55,
+        visibilityMiles: visMiles,
+        windMph: mphFromMs(h.wind?.speed),
+        elevation: Number(elevation.toFixed(2)),
+        afterglowScore: hourAfterglow,
+      }
+    })
+
+    return Response.json(
+      {
+        lat,
+        lon,
+        timezoneOffset,
+        currentLocalTime: formatWithOffset(currentDate, timezoneOffset),
+        sunsetLocalTime: formatWithOffset(sunsetDate, timezoneOffset),
+        peakWindow: {
+          start: formatWithOffset(peakStartDate, timezoneOffset),
+          end: formatWithOffset(peakEndDate, timezoneOffset),
+        },
+        skyScore,
         afterglowScore,
-      }),
-      liveConditions: {
-        clouds: current.clouds ?? 40,
-        humidity: current.humidity ?? 55,
-        visibilityMiles,
-        windMph,
-        sunElevation: Number(sunElevation.toFixed(2)),
-        summary: current.weather?.[0]?.description ?? "unknown",
+        explanation: buildExplanation({
+          clouds: current.clouds?.all ?? 40,
+          humidity: current.main?.humidity ?? 55,
+          visibilityMiles,
+          afterglowScore,
+        }),
+        liveConditions: {
+          clouds: current.clouds?.all ?? 40,
+          humidity: current.main?.humidity ?? 55,
+          visibilityMiles,
+          windMph,
+          sunElevation: Number(sunElevation.toFixed(2)),
+          summary: current.weather?.[0]?.description ?? "unknown",
+        },
+        nearbyRankedLocations: ranked,
+        elevationCurve: curve,
+        hourlyPreview: nextHours,
+        updatedAt: new Date().toISOString(),
       },
-      nearbyRankedLocations: ranked,
-      elevationCurve: curve,
-      hourlyPreview: nextHours,
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      headers: {
-        "Cache-Control": "no-store, max-age=0",
+      {
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      }
+    )
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Unknown live-score error"
+
+    return Response.json(
+      {
+        error: message,
+        hint: "Check OPENWEATHER_API_KEY and provider plan.",
       },
-    }
-  )
+      { status: 500 }
+    )
+  }
 }
