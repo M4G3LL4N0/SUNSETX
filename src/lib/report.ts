@@ -12,14 +12,14 @@ type Spot = {
   whyItWins: string
   panoramaLabel: string
   easeLabel: string
-  waterLabel: string  distanceMiles: number
+  waterLabel: string
+  distanceMiles: number
   driveMinutes: number
 }
 
-type ApiResponse = {
+type LiveScorePayload = {
   cityLabel?: string
   regionLabel?: string
-  timezoneOffset?: number
   skyScore: number
   afterglowScore: number
   sunsetLocalTime: string
@@ -27,16 +27,16 @@ type ApiResponse = {
     start: string
     end: string
   }
-  explanation: string  liveConditions: {
-    clouds: number    humidity: number
+  explanation: string
+  liveConditions: {
+    clouds: number
+    humidity: number
     visibilityMiles: number
     windMph: number
     sunElevation: number
     summary: string
   }
-  closeSpots: Spot[]
-  midRangeSpot: Spot | null
-  premiumSpot: Spot | null
+  nearbyRankedLocations: Spot[]
   aiNarrative?: {
     title?: string
     intro?: string
@@ -90,46 +90,106 @@ function buildSummaryBullets(score: number) {
   ]
 }
 
-export function generateSunsetReport(data: ApiResponse) {
-  const { skyScore, afterglowScore, sunsetLocalTime, peakWindow, explanation, liveConditions, closeSpots, midRangeSpot, premiumSpot, aiNarrative } = data
-
-  // Group spots into tiers
-  const quickOptions = closeSpots
-    .filter(spot => spot.driveMinutes >= 5 && spot.driveMinutes <= 15)
-    .slice(0, 3) // Top 3 quick options
-
-  const premiumOption = midRangeSpot || premiumSpot || (closeSpots.find(spot => spot.driveMinutes > 30) || null)
-
-  const regionalDestination = premiumSpot || (closeSpots.find(spot => spot.driveMinutes > 60) || null)
-
-  const worthIt = `SUNSETX Score: ${skyScore}/100 • Afterglow: ${afterglowScore}/100`
-  const timeline = `Peak window: ${peakWindow.start} – ${peakWindow.end}`
-  const whyTonightIsGood = aiNarrative?.whyTonightIsGood?.cloudStructure || explanation.split("·")[0] || "Balanced cloud layer for color reflection"
-  const whatToExpect = aiNarrative?.whatToExpect || [
-    "Warm gold, orange, and pink gradient potential",
-    "Best colors likely after the sun dips below the horizon",
-    "A smoother cinematic sky rather than chaotic storm drama"
-  ]
-  const whatToAvoid = aiNarrative?.avoid || [
-    "Blocked western horizons",
-    "Leaving too late and missing the peak",
-    "Low-value spots with poor panorama or awkward access"
-  ]
-  const goNoGo = aiNarrative?.decision?.goNoGo || "GO — HIGH CONFIDENCE"
-  const bestMove = aiNarrative?.decision?.bestMove || "Go to Junipero Serra Park and arrive before the peak window."
+export function generateSunsetReport(data: LiveScorePayload) {
+  const spots = (data.nearbyRankedLocations ?? []).slice(0, 3)
+  const bestSpot = spots[0]
 
   return {
-    sunsetScore: skyScore,
-    worthIt,
-    timeline,
-    whyTonightIsGood,
-    whatToExpect,
-    whatToAvoid,
-    goNoGo,
-    bestMove,
-    recommendations: {
-      quickOptions,
-      premiumOption,
-      regionalDestination    }
+    header: {
+      title:
+        data.aiNarrative?.title ??
+        `SUNSETX REPORT — ${(data.cityLabel ?? "YOUR AREA").toUpperCase()}`,
+      dateLabel: "Tonight",
+      regionLabel: data.regionLabel ?? "Nearby region",
+      preferenceLabel: "Closest quality spots • clean smell • low friction • easy access",
+      intro:
+        data.aiNarrative?.intro ??
+        `Tonight in ${data.cityLabel ?? "your area"}, conditions show a ${data.skyScore}/100 sunset setup with visible upside during the peak window.`,
+    },
+
+    summary: {
+      score: data.skyScore,
+      rating: getRating(data.skyScore),
+      worthIt: getWorthIt(data.skyScore),
+      bullets: buildSummaryBullets(data.skyScore),
+    },
+
+    timing: {
+      goldenHourStart: `~1 hour before ${data.sunsetLocalTime}`,
+      peakWindow: `${data.peakWindow.start} – ${data.peakWindow.end}`,
+      sunsetOfficial: data.sunsetLocalTime,
+      afterglow: `${data.peakWindow.end} + ~15–20 min`,
+      leaveBy: bestSpot
+        ? `Leave by about ${bestSpot.driveMinutes} minutes before peak to reach ${bestSpot.name} on time`
+        : "Leave 10–20 minutes before the peak window begins",
+    },
+
+    whyTonightIsGood: {
+      cloudStructure:
+        data.aiNarrative?.whyTonightIsGood?.cloudStructure ??
+        "Useful cloud structure can catch warm light without fully blocking the horizon.",
+      atmosphere:
+        data.aiNarrative?.whyTonightIsGood?.atmosphere ??
+        "Current visibility and air balance support cleaner color and readable gradients.",
+      wind:
+        data.aiNarrative?.whyTonightIsGood?.wind ??
+        "Moderate wind helps prevent the sky from feeling dull or flat.",
+    },
+
+    conditions: {
+      clouds: data.liveConditions.clouds,
+      humidity: data.liveConditions.humidity,
+      visibility: data.liveConditions.visibilityMiles,
+      wind: data.liveConditions.windMph,
+      explanation: data.explanation,
+    },
+
+    whatToExpect:
+      data.aiNarrative?.whatToExpect?.length
+        ? data.aiNarrative.whatToExpect
+        : [
+            "Strong gold to orange to pink gradient potential",
+            "Best colors likely after the sun dips below the horizon",
+            "Smooth, cinematic sky rather than chaotic storm drama",
+          ],
+
+    avoid:
+      data.aiNarrative?.avoid?.length
+        ? data.aiNarrative.avoid
+        : [
+            "Blocked western horizons",
+            "Heavy waterfront if smell or dampness hurts the experience",
+            "Leaving late and missing the real peak",
+          ],
+
+    spots,
+
+    decision: {
+      goNoGo:
+        data.aiNarrative?.decision?.goNoGo ??
+        (data.skyScore >= 75 ? "GO — HIGH CONFIDENCE" : "GO — MODERATE CONFIDENCE"),
+      bestMove:
+        data.aiNarrative?.decision?.bestMove ??
+        (bestSpot
+          ? `Go to ${bestSpot.name}. Arrive before ${data.peakWindow.start}. Stay through afterglow.`
+          : "Choose the highest-ranked nearby spot and arrive before peak."),
+    },
+
+    productInsight: {
+      title: "SUNSETX core product layer",
+      combinedSignals: [
+        "weather",
+        "terrain",
+        "smell",
+        "human experience",
+        "timing optimization",
+      ],
+      becomes: [
+        "daily report",
+        "push notification",
+        "leave now engine",
+        "viral share card",
+      ],
+    },
   }
 }
