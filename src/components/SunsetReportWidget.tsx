@@ -277,27 +277,34 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
         ))}
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <Card title="SUNSETX decision">
-          <div className="text-base font-medium">{report.decision.goNoGo}</div>
-          <div className="mt-3 text-xs leading-6 text-zinc-300">{report.decision.bestMove}</div>
-        </Card>
+      <div className="grid gap-2 md:grid-cols-2">
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/5 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">Decision</div>
+          <div className="text-xl font-medium text-white mb-3">{report.decision.goNoGo}</div>
+          <div className="text-sm leading-5 text-zinc-400">{report.decision.bestMove}</div>
+        </div>
 
-        <Card title={report.productInsight.title}>
-          <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">Combined signals</div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {report.productInsight.combinedSignals.map((item) => (
-              <Chip key={item}>{item}</Chip>
-            ))}
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/5 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-3">{report.productInsight.title}</div>
+          
+          <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 mb-3">
+            <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">Combined signals</div>
+            <div className="flex flex-wrap gap-1.5">
+              {report.productInsight.combinedSignals.map((item) => (
+                <Chip key={item}>{item}</Chip>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-4 text-[10px] uppercase tracking-[0.2em] text-zinc-500">This becomes</div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {report.productInsight.becomes.map((item) => (
-              <Chip key={item}>{item}</Chip>
-            ))}
+          <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3">
+            <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">This becomes</div>
+            <div className="flex flex-wrap gap-1.5">
+              {report.productInsight.becomes.map((item) => (
+                <Chip key={item}>{item}</Chip>
+              ))}
+            </div>
           </div>
-        </Card>
+        </div>
       </div>
     </section>
   )
