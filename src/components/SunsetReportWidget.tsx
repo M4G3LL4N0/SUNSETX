@@ -1,6 +1,7 @@
 "use client"
 
 type Spot = {
+  id?: string
   name: string
   address: string
   score: number
@@ -65,7 +66,7 @@ type Report = {
   }
 }
 
-function InfoChip({ children }: { children: React.ReactNode }) {
+function Chip({ children }: { children: React.ReactNode }) {
   return (
     <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-zinc-300">
       {children}
@@ -73,7 +74,7 @@ function InfoChip({ children }: { children: React.ReactNode }) {
   )
 }
 
-function Card({
+function Section({
   title,
   children,
 }: {
@@ -90,7 +91,7 @@ function Card({
   )
 }
 
-function SpotWidget({ spot, index }: { spot: Spot; index: number }) {
+function SpotCard({ spot, index }: { spot: Spot; index: number }) {
   return (
     <div className="rounded-[30px] border border-white/10 bg-black/30 p-6">
       <div className="flex items-start justify-between gap-4">
@@ -109,14 +110,14 @@ function SpotWidget({ spot, index }: { spot: Spot; index: number }) {
       </div>
 
       <div className="mt-5 flex flex-wrap gap-2">
-        <InfoChip>{spot.distanceMiles} mi away</InfoChip>
-        <InfoChip>~{spot.driveMinutes} min</InfoChip>
-        <InfoChip>Smell: {spot.smellLabel}</InfoChip>
-        <InfoChip>Parking: {spot.parkingLabel}</InfoChip>
-        <InfoChip>Vibe: {spot.vibeLabel}</InfoChip>
+        <Chip>{spot.distanceMiles} mi away</Chip>
+        <Chip>~{spot.driveMinutes} min</Chip>
+        <Chip>Smell: {spot.smellLabel}</Chip>
+        <Chip>Parking: {spot.parkingLabel}</Chip>
+        <Chip>Vibe: {spot.vibeLabel}</Chip>
       </div>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-3">
+      <div className="mt-5 grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
           <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Panorama</div>
           <div className="mt-2 text-sm leading-6 text-zinc-300">{spot.panoramaLabel}</div>
@@ -133,7 +134,7 @@ function SpotWidget({ spot, index }: { spot: Spot; index: number }) {
         </div>
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
           <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Why it wins</div>
           <div className="mt-2 text-sm leading-6 text-zinc-300">{spot.whyItWins}</div>
@@ -164,11 +165,11 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
-        <Card title="Overall sunset score">
+        <Section title="Overall sunset score">
           <div className="text-6xl font-bold tracking-tight">{report.summary.score} / 100</div>
           <div className="mt-4 flex flex-wrap gap-2">
-            <InfoChip>{report.summary.rating}</InfoChip>
-            <InfoChip>Worth it: {report.summary.worthIt}</InfoChip>
+            <Chip>{report.summary.rating}</Chip>
+            <Chip>Worth it: {report.summary.worthIt}</Chip>
           </div>
 
           <div className="mt-5 space-y-3">
@@ -181,9 +182,9 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
               </div>
             ))}
           </div>
-        </Card>
+        </Section>
 
-        <Card title="Timeline">
+        <Section title="Timeline (local time)">
           <div className="grid gap-3 md:grid-cols-2">
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
               <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Golden hour start</div>
@@ -210,36 +211,38 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
             <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Leave by</div>
             <div className="mt-2 text-sm leading-6 text-zinc-300">{report.timing.leaveBy}</div>
           </div>
-        </Card>
+        </Section>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card title="Cloud structure">
+      <div className="grid gap-4 md:grid-cols-3">
+        <Section title="Why tonight is good — cloud structure">
           <div className="text-sm leading-7 text-zinc-300">{report.whyTonightIsGood.cloudStructure}</div>
-        </Card>
-        <Card title="Atmospheric conditions">
+        </Section>
+
+        <Section title="Why tonight is good — atmosphere">
           <div className="text-sm leading-7 text-zinc-300">{report.whyTonightIsGood.atmosphere}</div>
-        </Card>
-        <Card title="Wind">
+        </Section>
+
+        <Section title="Why tonight is good — wind">
           <div className="text-sm leading-7 text-zinc-300">{report.whyTonightIsGood.wind}</div>
-        </Card>
+        </Section>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card title="Live sunset intelligence">
+      <div className="grid gap-4 md:grid-cols-2">
+        <Section title="Live sunset intelligence">
           <div className="flex flex-wrap gap-2">
-            <InfoChip>Clouds {report.conditions.clouds}%</InfoChip>
-            <InfoChip>Humidity {report.conditions.humidity}%</InfoChip>
-            <InfoChip>Visibility {report.conditions.visibility} mi</InfoChip>
-            <InfoChip>Wind {report.conditions.wind} mph</InfoChip>
+            <Chip>Clouds {report.conditions.clouds}%</Chip>
+            <Chip>Humidity {report.conditions.humidity}%</Chip>
+            <Chip>Visibility {report.conditions.visibility} mi</Chip>
+            <Chip>Wind {report.conditions.wind} mph</Chip>
           </div>
 
           <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-6 text-zinc-300">
             {report.conditions.explanation}
           </div>
-        </Card>
+        </Section>
 
-        <Card title="What to expect">
+        <Section title="What to expect">
           <div className="space-y-3">
             {report.whatToExpect.map((item) => (
               <div
@@ -250,10 +253,10 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
               </div>
             ))}
           </div>
-        </Card>
+        </Section>
       </div>
 
-      <Card title="What to avoid">
+      <Section title="What to avoid">
         <div className="grid gap-3">
           {report.avoid.map((item) => (
             <div
@@ -264,38 +267,38 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
             </div>
           ))}
         </div>
-      </Card>
+      </Section>
 
       <div className="space-y-4">
         <div className="text-xs uppercase tracking-[0.24em] text-zinc-500">
-          Top sunset spots
+          Top sunset spots (closest + ranked)
         </div>
         {report.spots.map((spot, index) => (
-          <SpotWidget key={`${spot.name}-${index}`} spot={spot} index={index} />
+          <SpotCard key={`${spot.name}-${index}`} spot={spot} index={index} />
         ))}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card title="SUNSETX decision">
+      <div className="grid gap-4 md:grid-cols-2">
+        <Section title="SUNSETX decision">
           <div className="text-lg font-medium">{report.decision.goNoGo}</div>
           <div className="mt-3 text-sm leading-6 text-zinc-300">{report.decision.bestMove}</div>
-        </Card>
+        </Section>
 
-        <Card title={report.productInsight.title}>
+        <Section title={report.productInsight.title}>
           <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Combined signals</div>
           <div className="mt-3 flex flex-wrap gap-2">
             {report.productInsight.combinedSignals.map((item) => (
-              <InfoChip key={item}>{item}</InfoChip>
+              <Chip key={item}>{item}</Chip>
             ))}
           </div>
 
           <div className="mt-5 text-xs uppercase tracking-[0.2em] text-zinc-500">This becomes</div>
           <div className="mt-3 flex flex-wrap gap-2">
             {report.productInsight.becomes.map((item) => (
-              <InfoChip key={item}>{item}</InfoChip>
+              <Chip key={item}>{item}</Chip>
             ))}
           </div>
-        </Card>
+        </Section>
       </div>
     </section>
   )
