@@ -1,4 +1,3 @@
-import dynamicImport from "next/dynamic"
 import { getSunsetData } from "@/lib/sunset"
 import { getWeather } from "@/lib/weather"
 import { calculateSkyScore } from "@/lib/scoring"
@@ -8,10 +7,10 @@ import { getPeakWindow, formatTime } from "@/lib/timing"
 import EducationRotator from "@/components/EducationRotator"
 import GlobalSunsetBoard from "@/components/GlobalSunsetBoard"
 import PerfectSunsetFramework from "@/components/PerfectSunsetFramework"
+import MapSection from "@/components/MapSection"
 
 export const dynamic = "force-dynamic"
-
-const Map = dynamicImport(() => import("@/components/Map"), { ssr: false })
+export const revalidate = 0
 
 export default async function Home() {
   const lat = 37.485
@@ -113,7 +112,7 @@ export default async function Home() {
             </div>
           </div>
 
-          <Map locations={ranked} />
+          <MapSection locations={ranked} />
         </section>
 
         <EducationRotator />
