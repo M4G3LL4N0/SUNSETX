@@ -39,35 +39,42 @@ export default function PerfectSunsetFramework() {
   }
 
   return (
-    <section className="mt-16 rounded-[28px] border border-white/10 bg-white/5 p-8 md:p-12 shadow-2xl backdrop-blur-sm">
-      <div className="text-xs uppercase tracking-[0.24em] text-zinc-500 mb-2">
-        What makes a great sunset
+    <section className="mt-8 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-4 md:p-6 shadow-lg backdrop-blur-xl">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">
+            Perfect sunset framework
+          </div>
+          <h2 className="text-2xl font-medium text-white">
+            {data.title}
+          </h2>
+        </div>
+
+        <div className="rounded-full border border-white/[0.08] bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-zinc-400">
+          Updated {new Date(data.updatedAt).toLocaleTimeString()}
+        </div>
       </div>
 
-      <h2 className="text-3xl md:text-4xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-300 via-pink-200 to-orange-200 mb-6">
-        {data.title}
-      </h2>
+      <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/5 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl mb-4">
+        <p className="text-sm leading-6 text-zinc-300">
+          {data.summary}
+        </p>
+      </div>
 
-      <p className="max-w-4xl text-xl leading-relaxed text-zinc-300 mb-12">
-        {data.summary}
-      </p>
-
-      <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         {data.bullets.map((item) => (
           <div
             key={item}
-            className="rounded-2xl border-l-4 border-l-pink-500 bg-white/[0.03] p-6 hover:bg-white/[0.06] transition-all duration-300"
+            className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-3 backdrop-blur-xl"
           >
-            <h3 className="text-xl font-semibold text-white mb-3">{item}</h3>
-            <p className="text-base leading-relaxed text-zinc-300">
-              This signal increases the odds that the sky will show stronger
-              structure, cleaner color, and a more memorable finish.
+            <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Signal</div>
+            <div className="text-lg font-medium text-white mb-2">{item}</div>
+            <p className="text-sm leading-5 text-zinc-400">
+              This factor helps predict stronger structure, cleaner color, and memorable finish.
             </p>
           </div>
         ))}
       </div>
-
-      <div className="mt-10 text-xs text-zinc-500 text-right">
         Updated {new Date(data.updatedAt).toLocaleTimeString()}
       </div>
     </section>
