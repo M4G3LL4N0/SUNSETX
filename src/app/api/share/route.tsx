@@ -3,11 +3,6 @@ import { ImageResponse } from "next/og"
 
 export const runtime = "edge"
 
-const size = {
-  width: 1200,
-  height: 630,
-}
-
 export async function GET() {
   return new ImageResponse(
     (
@@ -37,26 +32,28 @@ export async function GET() {
         <div
           style={{
             display: "flex",
-            fontSize: 96,
+            fontSize: 80,
             fontWeight: 800,
             marginTop: 16,
           }}
         >
-          92 🔥
+          Tonight’s Sunset
         </div>
 
         <div
           style={{
             display: "flex",
-            fontSize: 32,
-            marginTop: 12,
-            opacity: 0.85,
+            fontSize: 48,
+            marginTop: 16,
           }}
         >
-          Peak 7:21 PM
+          Check your live score
         </div>
       </div>
     ),
-    size
+    {
+      width: 1200,
+      height: 630,
+    }
   )
 }
