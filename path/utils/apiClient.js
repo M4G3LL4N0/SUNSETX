@@ -1,10 +1,16 @@
-import { createClient } from "node-fetch"
+import { fetch as fetchPolyfill } from "node-fetch";
 
-const apiClient = createClient({
-  baseURL: process.env.NEXT_PUBLIC_SITE_URL || "https://api.example.com"
-})
-
-export const fetchData = async (url: string, options: any = {}) => {
-  const response = await apiClient.get(url, options)
-  return response.json()
+export const fetchData = async (url: string, options: RequestInit = {}) => {
+  const response = await fetchPolyfill(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`HTTP ${response.status}: ${errorBody}`);
+  }
+  return response.json();
 }

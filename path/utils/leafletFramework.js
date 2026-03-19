@@ -1,13 +1,10 @@
-export const useLeaflet = (map: MapContainer) => {
-  const [map, setMap] = useState(map)
+import { useEffect, useRef } from "react";
+import { MapContainer } from "react-leaflet";
+
+export const useLeaflet = (initialMap: any) => {
+  const mapRef = useRef<any>(null);
   useEffect(() => {
-    const init = async () => {
-      const geocode = await reverseGeocode(map.lat, map.lon)
-      if (geocode) {
-        setMap(createMap(geocode.lat, geocode.lon))
-      }
-    }
-    init()
-  }, [map])
-  return map
+    mapRef.current = initialMap;
+  }, [initialMap]);
+  return mapRef.current;
 }
