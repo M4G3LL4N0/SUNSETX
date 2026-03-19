@@ -281,41 +281,46 @@ export default function LiveSunsetDashboard() {
   const topSpot = data.nearbyRankedLocations?.[0]
 
   return (
-    <section className="overflow-hidden rounded-[32px] border border-white/[0.08] bg-gradient-to-b from-black/40 to-black/20 p-6 md:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-2xl">
+    <section className="overflow-hidden rounded-[28px] border border-white/[0.08] bg-gradient-to-b from-black/30 via-black/20 to-black/10 p-5 md:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-xl">
       {/* Header */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center rounded-full bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-violet-200 ring-1 ring-violet-500/20 backdrop-blur-xl mb-4">
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center rounded-full bg-gradient-to-r from-violet-400/10 to-fuchsia-400/10 px-3 py-1 text-[11px] font-medium tracking-wide text-violet-100 ring-1 ring-violet-400/20 backdrop-blur-xl mb-3">
           Live sunset intelligence
         </div>
-        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-200 via-fuchsia-200 to-amber-200 mb-3">
+        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-100 via-fuchsia-100 to-amber-100 mb-2">
           SUNSETX
         </h1>
-        <p className="max-w-xl mx-auto text-base leading-relaxed text-zinc-300/90">
-          Location-aware sunset intelligence with nearby spots, timing precision, and premium guidance.
+        <p className="max-w-lg mx-auto text-sm leading-relaxed text-zinc-300/80">
+          Premium sunset intelligence with real-time scoring and location-aware guidance
         </p>
       </div>
 
-      {/* Hero Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        {/* Score Card */}
-        <div className="col-span-2 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-500/10 via-fuchsia-500/5 to-transparent p-4 shadow-xl backdrop-blur-xl">
-          <div className="flex items-baseline gap-2">
-            <div className="text-5xl font-bold text-white">{data.skyScore}</div>
-            <div className="text-sm text-zinc-400">/ 100</div>
+      {/* Widget Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-6">
+        {/* Main Score Widget */}
+        <div className="col-span-2 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/10 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
+          <div className="flex items-baseline justify-between">
+            <div className="flex items-baseline gap-1.5">
+              <div className="text-4xl font-bold text-white">{data.skyScore}</div>
+              <div className="text-sm text-zinc-400 font-medium">/ 100</div>
+            </div>
+            <div className="text-xs text-zinc-400 font-medium">{status}</div>
           </div>
-          <div className="mt-2 text-sm font-medium text-zinc-300">Tonight's Score</div>
+          <div className="mt-2 text-sm font-medium text-zinc-300">Tonight's Sunset Score</div>
+          <div className="mt-1.5 text-xs text-zinc-400">{data.cityLabel}</div>
         </div>
 
-        {/* Peak Window */}
-        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 shadow-xl backdrop-blur-xl">
-          <div className="text-lg font-semibold text-white">{data.peakWindow.start}</div>
-          <div className="text-xs text-zinc-400 mt-1">Peak Start</div>
+        {/* Time Widgets */}
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.03] to-white/[0.01] p-3 shadow-lg backdrop-blur-xl">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">Peak Start</div>
+          <div className="text-lg font-medium text-white">{data.peakWindow.start}</div>
+          <div className="mt-1 text-xs text-zinc-400">Best color window</div>
         </div>
 
-        {/* Sunset Time */}
-        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 shadow-xl backdrop-blur-xl">
-          <div className="text-lg font-semibold text-white">{data.sunsetLocalTime}</div>
-          <div className="text-xs text-zinc-400 mt-1">Sunset</div>
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.03] to-white/[0.01] p-3 shadow-lg backdrop-blur-xl">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">Sunset</div>
+          <div className="text-lg font-medium text-white">{data.sunsetLocalTime}</div>
+          <div className="mt-1 text-xs text-zinc-400">Official time</div>
         </div>
       </div>
 
