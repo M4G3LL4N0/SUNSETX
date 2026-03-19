@@ -170,30 +170,34 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
         <p className="mt-4 text-sm leading-6 text-zinc-300">{report.header.intro}</p>
       </Card>
 
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <Card title="Golden hour">
-          <div className="text-sm font-medium text-zinc-100">{report.timing.goldenHourStart}</div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <Card title="Golden Hour">
+          <div className="text-lg font-medium text-white">{report.timing.goldenHourStart}</div>
+          <div className="mt-0.5 text-xs text-zinc-400">Start time</div>
         </Card>
-        <Card title="Peak window">
-          <div className="text-sm font-medium text-zinc-100">{report.timing.peakWindow}</div>
+        <Card title="Peak Window">
+          <div className="text-lg font-medium text-white">{report.timing.peakWindow}</div>
+          <div className="mt-0.5 text-xs text-zinc-400">Best color</div>
         </Card>
-        <Card title="Official sunset">
-          <div className="text-sm font-medium text-zinc-100">{report.timing.sunsetOfficial}</div>
+        <Card title="Official Sunset">
+          <div className="text-lg font-medium text-white">{report.timing.sunsetOfficial}</div>
+          <div className="mt-0.5 text-xs text-zinc-400">Sun crosses horizon</div>
         </Card>
         <Card title="Afterglow">
-          <div className="text-sm font-medium text-zinc-100">{report.timing.afterglow}</div>
+          <div className="text-lg font-medium text-white">{report.timing.afterglow}</div>
+          <div className="mt-0.5 text-xs text-zinc-400">Post-sunset color</div>
         </Card>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-3">
-        <Card title="Cloud structure">
-          <div className="text-xs leading-6 text-zinc-300">{report.whyTonightIsGood.cloudStructure}</div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
+        <Card title="Cloud Structure">
+          <div className="text-sm leading-5 text-zinc-300">{report.whyTonightIsGood.cloudStructure}</div>
         </Card>
         <Card title="Atmosphere">
-          <div className="text-xs leading-6 text-zinc-300">{report.whyTonightIsGood.atmosphere}</div>
+          <div className="text-sm leading-5 text-zinc-300">{report.whyTonightIsGood.atmosphere}</div>
         </Card>
         <Card title="Wind">
-          <div className="text-xs leading-6 text-zinc-300">{report.whyTonightIsGood.wind}</div>
+          <div className="text-sm leading-5 text-zinc-300">{report.whyTonightIsGood.wind}</div>
         </Card>
       </div>
 
