@@ -43,7 +43,8 @@ type ApiResponse = {
     humidity: number
     visibilityMiles: number
     windMph: number
-    sunElevation: number    summary: string
+    sunElevation: number
+    summary: string
   }
   closeSpots: NearbySpot[]
   midRangeSpot: NearbySpot | null
@@ -261,6 +262,27 @@ function MiniCard({
   )
 }
 
+function TierSpotCard({ spot, rank, label }: { spot: NearbySpot, rank?: number, label?: string }) {
+  return (
+    <div className="rounded-[24px] border border-white/10 bg-white/5 p-3 backdrop-blur-xl hover:bg-white/10 transition-colors">
+      {label && <div className="text-[10px] uppercase tracking-wider text-zinc-500 mb-1">{label}</div>}
+      {rank !== undefined && <div className="text-[10px] uppercase tracking-wider text-zinc-500 mb-1">#{rank}</div>}
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <div className="text-sm font-medium text-zinc-100">{spot.name}</div>
+          <div className="text-xs text-zinc-400 truncate">{spot.address}</div>
+          <div className="text-[10px] text-zinc-500 mt-0.5">{spot.distanceMiles} mi • {spot.driveMinutes} min</div>
+        </div>
+        <div className="text-right">
+          <div className="text-lg font-bold text-zinc-100">{spot.score}</div>
+          <div className="text-[10px] text-zinc-500">Score</div>
+        </div>
+      </div>
+      <div className="mt-1 text-[10px] text-zinc-400 line-clamp-1">{spot.bestFor}</div>
+    </div>
+  )
+}
+
 function getUserKey() {
   if (typeof window === "undefined") return "anonymous"
   const existing = localStorage.getItem("sunsetx:user-key")
@@ -386,10 +408,12 @@ export default function LiveSunsetDashboard() {
   return (
     <section className="overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl md:p-6">
       {/* DEBUG INFO */}
-      <div className="mb-4 flex flex-wrap gap-2 text-xs">
-        <Pill>Lat: {coords.lat}</Pill>
-        <Pill>Lon: {coords.lon}</Pill>
-        <Pill>{fallbackMode ? "Fallback Mode" : "Live GPS Active"}</Pill>
+      <div className="mb-4 flex flex-wrap gap-2">
+        {coords.lat && <Pill>Lat: {coords.lat}</Pill>}
+        {coords.lon && <Pill>Lon: {coords.lon}</Pill>}
+        <Pill className={fallbackMode ? "border-red-500/30 text-red-300" : "border-green-500/30 text-green-300"}>
+          {fallbackMode ? "Fallback Mode" : "Live GPS Active"}
+        </Pill>
         <Pill>Close: {data.closeSpots.length}</Pill>
         <Pill>Mid: {data.midRangeSpot ? 1 : 0}</Pill>
         <Pill>Premium: {data.premiumSpot ? 1 : 0}</Pill>
@@ -401,8 +425,13 @@ export default function LiveSunsetDashboard() {
             Personalized live sunset report
           </div>
 
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-6xl">
-            SUNSETX          </h1>
+          <div className="mt-3 flex items-center gap-3">
+            <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">SUNSETX</h1>
+            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${fallbackMode ? 'bg-red-500/20 text-red-300' : 'bg-green-500/20 text-green-300'}`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${fallbackMode ? 'bg-red-400' : 'bg-green-400'} animate-pulse`}></span>
+              {fallbackMode ? 'FALLBACK' : 'LIVE'}
+            </span>
+          </div>
 
           <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-300 md:text-base">
             Every visitor sees a location-aware sunset report with nearby spots,
@@ -444,8 +473,8 @@ export default function LiveSunsetDashboard() {
         </div>
       </div>
 
-      <div className="mt-5 grid gap-3 lg:grid-cols-3">
-        <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-xl">
+      <div className="mt-6 grid gap-3 lg:grid-cols-3">
+        <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.04] p-3 backdrop-blur-xl">
           <div className="text-sm font-medium text-zinc-100">Leave-now engine</div>
           <div className="mt-2 text-sm text-zinc-300">
             {leaveNow?.copy ?? "Leave timing unavailable."}
@@ -464,7 +493,7 @@ export default function LiveSunsetDashboard() {
           timezoneOffset={data.timezoneOffset}
         />
 
-        <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-xl">
+        <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.04] p-3 backdrop-blur-xl">
           <div className="text-sm font-medium text-zinc-100">Share</div>
           <div className="mt-2 text-sm text-zinc-300">
             Create a live sunset share card from your current report.
@@ -482,47 +511,33 @@ export default function LiveSunsetDashboard() {
       </div>
 
       {/* RECOMMENDATION TIERS */}
-      <div className="mt-5 grid gap-2 md:grid-cols-3">
-        <div className="text-sm font-medium text-zinc-100">Quick Options (5‑15 min)</div>
-        {quickOptions.map((spot, index) => (
-          <div key={spot.id} className="rounded-[24px] border border-white/[0.08] bg-white/[0.04] p-3 backdrop-blur-xl">
-            <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">#{index + 1}</div>
-            <div className="text-sm font-medium">{spot.name}</div>
-            <div className="text-xs text-zinc-300">{spot.address}</div>
-            <div className="mt-1 text-[11px] text-zinc-400">{spot.distanceMiles} mi • {spot.driveMinutes} min</div>
-            <div className="text-[11px] font-medium">{spot.score}/100</div>
-          </div>
-        ))}
+      <div className="mt-6">
+        <div className="text-sm font-medium text-zinc-100 mb-3">Quick Options (5‑15 min)</div>
+        <div className="grid gap-3 md:grid-cols-3">
+          {quickOptions.map((spot, index) => (
+            <TierSpotCard key={spot.id} spot={spot} rank={index+1} />
+          ))}
+        </div>
       </div>
 
-      <div className="mt-4 grid gap-2 md:grid-cols-2">
-        <div className="text-sm font-medium text-zinc-100">Premium Option (~30 min)</div>
-        <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.04] p-3 backdrop-blur-xl">
+      <div className="mt-6">
+        <div className="text-sm font-medium text-zinc-100 mb-3">Premium Option (~30 min)</div>
+        <div className="rounded-[24px] border border-white/10 bg-white/5 p-3 backdrop-blur-xl">
           {premiumOption ? (
-            <div>
-              <div className="text-sm font-medium">{premiumOption.name}</div>
-              <div className="text-xs text-zinc-300">{premiumOption.address}</div>
-              <div className="mt-1 text-[11px] text-zinc-400">{premiumOption.distanceMiles} mi • {premiumOption.driveMinutes} min</div>
-              <div className="text-[11px] font-medium">{premiumOption.score}/100</div>
-            </div>
+            <TierSpotCard spot={premiumOption} label="Premium option" />
           ) : (
-            <div className="text-zinc-300">None</div>
+            <div className="text-zinc-300 text-sm">None</div>
           )}
         </div>
       </div>
 
-      <div className="mt-4 grid gap-2 md:grid-cols-2">
-        <div className="text-sm font-medium text-zinc-100">Regional Destination (~1 hr)</div>
-        <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.04] p-3 backdrop-blur-xl">
+      <div className="mt-6">
+        <div className="text-sm font-medium text-zinc-100 mb-3">Regional Destination (~1 hr)</div>
+        <div className="rounded-[24px] border border-white/10 bg-white/5 p-3 backdrop-blur-xl">
           {regionalDestination ? (
-            <div>
-              <div className="text-sm font-medium">{regionalDestination.name}</div>
-              <div className="text-xs text-zinc-300">{regionalDestination.address}</div>
-              <div className="mt-1 text-[11px] text-zinc-400">{regionalDestination.distanceMiles} mi • {regionalDestination.driveMinutes} min</div>
-              <div className="text-[11px] font-medium">{regionalDestination.score}/100</div>
-            </div>
+            <TierSpotCard spot={regionalDestination} label="Destination spot" />
           ) : (
-            <div className="text-zinc-300">None</div>
+            <div className="text-zinc-300 text-sm">None</div>
           )}
         </div>
       </div>

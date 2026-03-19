@@ -5,13 +5,16 @@ type Spot = {
   name: string
   address: string
   score: number
-  spotScore: number  scent: number
+  spotScore: number
+  scent: number
   smellLabel: string
   parkingLabel: string
   vibeLabel: string
-  bestFor: string  whyItWins: string
+  bestFor: string
+  whyItWins: string
   panoramaLabel: string
-  easeLabel: string  waterLabel: string
+  easeLabel: string
+  waterLabel: string
   distanceMiles: number
   driveMinutes: number
 }
@@ -65,7 +68,7 @@ type Report = {
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-[11px] font-medium text-zinc-300">
+    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium text-zinc-300">
       {children}
     </span>
   )
@@ -76,7 +79,8 @@ function Card({
   children,
   className = "",
 }: {
-  title?: string  children: React.ReactNode
+  title?: string
+  children: React.ReactNode
   className?: string
 }) {
   return (
@@ -95,56 +99,54 @@ function Card({
 
 function SpotCard({ spot, index, label }: { spot: Spot; index: number; label?: string }) {
   return (
-    <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/5 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
-      <div className="flex items-start justify-between gap-4">
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-3 backdrop-blur-xl">
+      <div className="flex items-start justify-between gap-2">
         <div>
           {label && (
-            <div className="text-[10px] uppercase tracking-wider text-zinc-500 mb-1.5">
-              {label}
-            </div>
+            <div className="text-[10px] uppercase tracking-wider text-zinc-500 mb-1">{label}</div>
           )}
-          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">
-            Spot #{index + 1}
-          </div>
-          <div className="text-xl font-medium text-white mb-1">{spot.name}</div>
-          <div className="text-sm text-zinc-400">{spot.address}</div>
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">Spot #{index + 1}</div>
+          <div className="text-base font-medium text-white mb-1">{spot.name}</div>
+          <div className="text-xs text-zinc-400 truncate">{spot.address}</div>
+          <div className="text-[10px] text-zinc-500 mt-0.5">{spot.distanceMiles} mi • {spot.driveMinutes} min</div>
         </div>
 
         <div className="text-right">
           <div className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-100 to-fuchsia-100">
             {spot.score}
           </div>
-          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mt-1">Score</div>
+          <div className="text-[10px] uppercase tracking-wide text-zinc-500 mt-1">Score</div>
         </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        <Chip>{spot.distanceMiles} mi</Chip>
-        <Chip>~{spot.driveMinutes} min</Chip>
+      <div className="mt-2 flex flex-wrap gap-1">
         <Chip>{spot.smellLabel}</Chip>
         <Chip>{spot.parkingLabel} parking</Chip>
         <Chip>{spot.vibeLabel}</Chip>
       </div>
 
-      <div className="mt-2">
-        <Card title="Panorama">
-          <div className="text-sm leading-5 text-zinc-300">{spot.panoramaLabel}</div>
-        </Card>
-        <Card title="Ease">
-          <div className="text-sm leading-5 text-zinc-300">{spot.easeLabel}</div>
-        </Card>
-        <Card title="Best for">
-          <div className="text-sm leading-5 text-zinc-300">{spot.bestFor}</div>
-        </Card>
-        <Card title="Water risk">
-          <div className="text-sm leading-5 text-zinc-300">{spot.waterLabel}</div>
-        </Card>
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <div>
+          <div className="text-[10px] uppercase text-zinc-500">Panorama</div>
+          <div className="text-xs text-zinc-300">{spot.panoramaLabel}</div>
+        </div>
+        <div>
+          <div className="text-[10px] uppercase text-zinc-500">Ease</div>
+          <div className="text-xs text-zinc-300">{spot.easeLabel}</div>
+        </div>
+        <div>
+          <div className="text-[10px] uppercase text-zinc-500">Best for</div>
+          <div className="text-xs text-zinc-300">{spot.bestFor}</div>
+        </div>
+        <div>
+          <div className="text-[10px] uppercase text-zinc-500">Water risk</div>
+          <div className="text-xs text-zinc-300">{spot.waterLabel}</div>
+        </div>
       </div>
 
       <div className="mt-2">
-        <Card title="Why it wins">
-          <div className="text-sm leading-5 text-zinc-300">{spot.whyItWins}</div>
-        </Card>
+        <div className="text-[10px] uppercase text-zinc-500 mb-1">Why it wins</div>
+        <div className="text-xs text-zinc-300">{spot.whyItWins}</div>
       </div>
     </div>
   )
@@ -159,7 +161,7 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
   const premiumSpot = report.spots[4] || null
 
   return (
-    <section className="mt-4 space-y-2">
+    <section className="mt-4 space-y-3">
       <div className="rounded-[24px] border border-white/[0.08] bg-gradient-to-br from-violet-400/10 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -214,28 +216,28 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
           <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-3">Live conditions</div>
           <div className="grid grid-cols-2 gap-2 mb-3">
             <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-2">
-              <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">Clouds</div>
+              <div className="text-[10px] uppercase tracking-wide text-zinc-500 mb-1">Clouds</div>
               <div className="flex items-baseline gap-1">
                 <div className="text-lg font-medium text-white">{report.conditions.clouds}</div>
                 <div className="text-sm text-zinc-400">%</div>
               </div>
             </div>
             <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-2">
-              <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">Humidity</div>
+              <div className="text-[10px] uppercase tracking-wide text-zinc-500 mb-1">Humidity</div>
               <div className="flex items-baseline gap-1">
                 <div className="text-lg font-medium text-white">{report.conditions.humidity}</div>
                 <div className="text-sm text-zinc-400">%</div>
               </div>
             </div>
             <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-2">
-              <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">Visibility</div>
+              <div className="text-[10px] uppercase tracking-wide text-zinc-500 mb-1">Visibility</div>
               <div className="flex items-baseline gap-1">
                 <div className="text-lg font-medium text-white">{report.conditions.visibility}</div>
                 <div className="text-sm text-zinc-400">mi</div>
               </div>
             </div>
             <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-2">
-              <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">Wind</div>
+              <div className="text-[10px] uppercase tracking-wide text-zinc-500 mb-1">Wind</div>
               <div className="flex items-baseline gap-1">
                 <div className="text-lg font-medium text-white">{report.conditions.wind}</div>
                 <div className="text-sm text-zinc-400">mph</div>
@@ -305,7 +307,7 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
           <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-3">{report.productInsight.title}</div>
           
           <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 mb-3">
-            <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">Combined signals</div>
+            <div className="text-[10px] uppercase tracking-wide text-zinc-500 mb-2">Combined signals</div>
             <div className="flex flex-wrap gap-1.5">
               {report.productInsight.combinedSignals.map((item) => (
                 <Chip key={item}>{item}</Chip>
@@ -314,7 +316,7 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
           </div>
 
           <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3">
-            <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">This becomes</div>
+            <div className="text-[10px] uppercase tracking-wide text-zinc-500 mb-2">This becomes</div>
             <div className="flex flex-wrap gap-1.5">
               {report.productInsight.becomes.map((item) => (
                 <Chip key={item}>{item}</Chip>
