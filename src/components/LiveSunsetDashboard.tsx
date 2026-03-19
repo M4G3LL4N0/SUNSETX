@@ -214,7 +214,9 @@ function MiniCard({
   className?: string
 }) {
   return (
-    <div className={`rounded-[24px] border border-white/10 p-4 backdrop-blur-2xl ${className}`}>
+    <div
+      className={`rounded-[24px] border border-white/10 p-4 backdrop-blur-2xl ${className}`}
+    >
       <div className="text-[11px] uppercase tracking-[0.22em] text-zinc-400">{title}</div>
       <div className="mt-2 text-2xl font-semibold tracking-tight text-white">{value}</div>
       {subtitle ? <div className="mt-1 text-xs text-zinc-300">{subtitle}</div> : null}

@@ -85,7 +85,7 @@ function Card({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-3 shadow-lg backdrop-blur-xl ${className}`}
+      className={`rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/5 via-fuchsia-400/5 to-transparent p-3 shadow-lg backdrop-blur-xl ${className}`}
     >
       {title ? (
         <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">
@@ -123,7 +123,7 @@ function SpotCard({ spot, index }: { spot: Spot; index: number }) {
         <Chip>{spot.vibeLabel}</Chip>
       </div>
 
-      <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-2">
         <Card title="Panorama">
           <div className="text-sm leading-5 text-zinc-300">{spot.panoramaLabel}</div>
         </Card>
@@ -189,7 +189,7 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
+      <div className="grid gap-2 md:grid-cols-3">
         <Card title="Cloud Structure">
           <div className="text-sm leading-5 text-zinc-300">{report.whyTonightIsGood.cloudStructure}</div>
         </Card>
@@ -251,20 +251,6 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-orange-400/5 via-amber-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
-        <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-3">What to avoid</div>
-        <div className="grid gap-2">
-          {report.avoid.map((item) => (
-            <div
-              key={item}
-              className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 text-sm leading-5 text-zinc-300"
-            >
-              {item}
-            </div>
-          ))}
         </div>
       </div>
 

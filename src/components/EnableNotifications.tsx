@@ -80,11 +80,9 @@ export default function EnableNotifications({
   }
 
   return (
-    <div className="rounded-[24px] border border-white/10 bg-white/[0.06] p-4 backdrop-blur-xl">
-      <div className="text-sm font-medium text-zinc-100">Notifications</div>
-      <div className="mt-2 text-sm text-zinc-300">
-        Get daily sunset alerts and leave-now reminders.
-      </div>
+    <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-100 to-fuchsia-100 p-4 shadow-lg backdrop-blur-xl">
+      <div className="text-[14px] text-zinc-400">Notifications</div>
+      <div className="mt-2 text-sm text-zinc-300">Get daily sunset alerts and leave-now reminders.</div>
       <button
         type="button"
         onClick={enable}
