@@ -415,7 +415,7 @@ export default function LiveSunsetDashboard() {
       </div>
 
       {/* Actions Row */}
-      <div className="flex flex-wrap gap-4 justify-center mb-12">
+      <div className="flex flex-wrap gap-3 justify-center mb-8">
         <EnableNotifications
           lat={coords.lat}
           lon={coords.lon}
@@ -440,13 +440,13 @@ export default function LiveSunsetDashboard() {
 
       {/* Preferences Panel (collapsible) */}
       {showPreferences && (
-        <div className="mb-12">
+        <div className="mb-8">
           <PreferencesPanel userKey={userKey} />
         </div>
       )}
 
       {/* Detailed Report */}
-      <div className="mt-16">
+      <div className="mt-8">
         <SunsetReportWidget report={report} />
       </div>
     </section>
