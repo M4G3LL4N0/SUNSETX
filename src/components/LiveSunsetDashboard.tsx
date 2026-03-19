@@ -162,11 +162,31 @@ function buildEmergencyData(): ApiResponse {
   }
 }
 
-function StatusPill({ children }: { children: React.ReactNode }) {
+function Pill({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-zinc-400">
+    <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-medium text-zinc-200 backdrop-blur-xl">
       {children}
     </span>
+  )
+}
+
+function MiniCard({
+  title,
+  value,
+  subtitle,
+  className = "",
+}: {
+  title: string
+  value: string
+  subtitle?: string
+  className?: string
+}) {
+  return (
+    <div className={`rounded-[24px] border border-white/10 p-4 backdrop-blur-2xl ${className}`}>
+      <div className="text-[11px] uppercase tracking-[0.22em] text-zinc-400">{title}</div>
+      <div className="mt-2 text-2xl font-semibold tracking-tight text-white">{value}</div>
+      {subtitle ? <div className="mt-1 text-xs text-zinc-300">{subtitle}</div> : null}
+    </div>
   )
 }
 
@@ -279,48 +299,72 @@ export default function LiveSunsetDashboard() {
 
   if (!data || !report) {
     return (
-      <section className="rounded-[36px] border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.03] p-8">
+      <section className="rounded-[32px] border border-white/10 bg-white/5 p-6 backdrop-blur-2xl">
         <div className="text-sm text-zinc-400">Loading SUNSETX live engine…</div>
       </section>
     )
   }
 
   return (
-    <section className="rounded-[36px] border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.03] p-8 shadow-[0_30px_120px_rgba(0,0,0,0.45)]">
-      <div className="text-sm uppercase tracking-[0.24em] text-zinc-500">
-        Personalized live sunset report
-      </div>
-
-      <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <section className="overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl md:p-6">
+      <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
-          <h1 className="text-5xl font-semibold tracking-tight md:text-7xl">
+          <div className="text-[11px] uppercase tracking-[0.28em] text-zinc-400">
+            Personalized live sunset report
+          </div>
+
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-6xl">
             SUNSETX
           </h1>
 
-          <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-300 md:text-lg">
-            Every visitor sees a live, location-aware sunset report with nearby spots,
-            timing, conditions, narrative explanation, and a clear go / no-go decision.
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-300 md:text-base">
+            Every visitor sees a location-aware sunset report with nearby spots,
+            timing intelligence, premium narrative guidance, and a clear go / no-go decision.
           </p>
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Pill>{status}</Pill>
+            <Pill>Mode: {fallbackMode ? "Fallback" : "Live"}</Pill>
+            <Pill>Updated {new Date(data.updatedAt).toLocaleTimeString()}</Pill>
+          </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <StatusPill>{status}</StatusPill>
-          <StatusPill>AI: fallback</StatusPill>
-          <StatusPill>{fallbackMode ? "Emergency fallback active" : "Live data active"}</StatusPill>
-          <StatusPill>
-            Updated {new Date(data.updatedAt).toLocaleTimeString()}
-          </StatusPill>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <MiniCard
+            title="Tonight"
+            value={`${data.skyScore}`}
+            subtitle="Sunset score"
+            className="bg-[linear-gradient(135deg,rgba(244,114,182,0.22),rgba(251,146,60,0.16),rgba(56,189,248,0.14))]"
+          />
+          <MiniCard
+            title="Peak"
+            value={`${data.peakWindow.start}`}
+            subtitle={`${data.peakWindow.start} – ${data.peakWindow.end}`}
+            className="bg-[linear-gradient(135deg,rgba(59,130,246,0.18),rgba(168,85,247,0.16))]"
+          />
+          <MiniCard
+            title="Sunset"
+            value={data.sunsetLocalTime}
+            subtitle="Official sunset"
+            className="bg-[linear-gradient(135deg,rgba(251,146,60,0.18),rgba(244,114,182,0.14))]"
+          />
+          <MiniCard
+            title="Top Spot"
+            value={data.nearbyRankedLocations?.[0]?.name ?? "Nearby spot"}
+            subtitle={`~${data.nearbyRankedLocations?.[0]?.driveMinutes ?? 0} min away`}
+            className="bg-[linear-gradient(135deg,rgba(34,197,94,0.16),rgba(16,185,129,0.10))]"
+          />
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-4">
-        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+      <div className="mt-5 grid gap-3 lg:grid-cols-4">
+        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
           <div className="text-sm font-medium text-zinc-100">Leave-now engine</div>
-          <div className="mt-2 text-sm text-zinc-400">
+          <div className="mt-2 text-sm text-zinc-300">
             {leaveNow?.copy ?? "Leave timing unavailable."}
           </div>
           {leaveNow?.leaveAt ? (
-            <div className="mt-3 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300">
+            <div className="mt-3 inline-flex rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-zinc-200">
               Ideal leave time: {leaveNow.leaveAt}
             </div>
           ) : null}
@@ -333,9 +377,9 @@ export default function LiveSunsetDashboard() {
           timezoneOffset={data.timezoneOffset}
         />
 
-        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
           <div className="text-sm font-medium text-zinc-100">Share</div>
-          <div className="mt-2 text-sm text-zinc-400">
+          <div className="mt-2 text-sm text-zinc-300">
             Create a live sunset share card from your current report.
           </div>
           <div className="mt-4">

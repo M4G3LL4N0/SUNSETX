@@ -80,9 +80,9 @@ export default function EnableNotifications({
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-      <div className="text-sm font-medium text-zinc-100">Push notifications</div>
-      <div className="mt-2 text-sm text-zinc-400">
+    <div className="rounded-[24px] border border-white/10 bg-white/[0.06] p-4 backdrop-blur-xl">
+      <div className="text-sm font-medium text-zinc-100">Notifications</div>
+      <div className="mt-2 text-sm text-zinc-300">
         Get daily sunset alerts and leave-now reminders.
       </div>
       <button
@@ -92,7 +92,7 @@ export default function EnableNotifications({
       >
         Enable notifications
       </button>
-      {status ? <div className="mt-3 text-sm text-zinc-400">{status}</div> : null}
+      {status ? <div className="mt-3 text-xs text-zinc-400">{status}</div> : null}
     </div>
   )
 }

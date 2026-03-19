@@ -51,7 +51,7 @@ export default function PreferencesPanel({
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+    <div className="rounded-[24px] border border-white/10 bg-white/[0.06] p-4 backdrop-blur-xl">
       <div className="text-sm font-medium text-zinc-100">Preferences</div>
 
       <div className="mt-4 space-y-3 text-sm text-zinc-300">
@@ -83,7 +83,9 @@ export default function PreferencesPanel({
         </label>
 
         <label className="block">
-          <div className="mb-2">Max drive minutes: {prefs.maxDriveMinutes}</div>
+          <div className="mb-2 text-xs text-zinc-400">
+            Max drive minutes: {prefs.maxDriveMinutes}
+          </div>
           <input
             type="range"
             min="5"
@@ -103,7 +105,7 @@ export default function PreferencesPanel({
         Save preferences
       </button>
 
-      {status ? <div className="mt-3 text-sm text-zinc-400">{status}</div> : null}
+      {status ? <div className="mt-3 text-xs text-zinc-400">{status}</div> : null}
     </div>
   )
 }
