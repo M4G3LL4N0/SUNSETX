@@ -3,14 +3,43 @@ import { createServerSupabase } from "@/lib/supabase-server"
 
 export const dynamic = "force-dynamic"
 
-webpush.setVapidDetails(
-  process.env.VAPID_SUBJECT || "mailto:you@example.com",
-  process.env.VAPID_PUBLIC_KEY || "",
-  process.env.VAPID_PRIVATE_KEY || ""
-)
+function configureWebPush() {
+  const subject = process.env.VAPID_SUBJECT
+  const publicKey = process.env.VAPID_PUBLIC_KEY
+  const privateKey = process.env.VAPID_PRIVATE_KEY
+
+  if (!subject || !publicKey || !privateKey) {
+    return {
+      ok: false as const,
+      error: "Missing VAPID environment variables",
+    }
+  }
+
+  try {
+    webpush.setVapidDetails(subject, publicKey, privateKey)
+    return { ok: true as const }
+  } catch (error) {
+    return {
+      ok: false as const,
+      error: error instanceof Error ? error.message : "Invalid VAPID configuration",
+    }
+  }
+}
 
 export async function POST(req: Request) {
   try {
+    const config = configureWebPush()
+
+    if (!config.ok) {
+      return Response.json(
+        {
+          error: "Push notifications are not configured yet.",
+          details: config.error,
+        },
+        { status: 503 }
+      )
+    }
+
     const body = await req.json()
     const endpoint = body?.endpoint
     const payload = body?.payload ?? {
