@@ -201,31 +201,57 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
         </Card>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <Card title="Live sunset intelligence">
-          <div className="flex flex-wrap gap-2">
-            <Chip>Clouds {report.conditions.clouds}%</Chip>
-            <Chip>Humidity {report.conditions.humidity}%</Chip>
-            <Chip>Visibility {report.conditions.visibility} mi</Chip>
-            <Chip>Wind {report.conditions.wind} mph</Chip>
+      <div className="grid gap-2 md:grid-cols-2">
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/5 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-3">Live conditions</div>
+          <div className="grid grid-cols-2 gap-2 mb-3">
+            <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-2">
+              <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">Clouds</div>
+              <div className="flex items-baseline gap-1">
+                <div className="text-lg font-medium text-white">{report.conditions.clouds}</div>
+                <div className="text-sm text-zinc-400">%</div>
+              </div>
+            </div>
+            <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-2">
+              <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">Humidity</div>
+              <div className="flex items-baseline gap-1">
+                <div className="text-lg font-medium text-white">{report.conditions.humidity}</div>
+                <div className="text-sm text-zinc-400">%</div>
+              </div>
+            </div>
+            <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-2">
+              <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">Visibility</div>
+              <div className="flex items-baseline gap-1">
+                <div className="text-lg font-medium text-white">{report.conditions.visibility}</div>
+                <div className="text-sm text-zinc-400">mi</div>
+              </div>
+            </div>
+            <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-2">
+              <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">Wind</div>
+              <div className="flex items-baseline gap-1">
+                <div className="text-lg font-medium text-white">{report.conditions.wind}</div>
+                <div className="text-sm text-zinc-400">mph</div>
+              </div>
+            </div>
           </div>
-          <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-xs leading-5 text-zinc-300">
+          <div className="text-sm leading-5 text-zinc-400">
             {report.conditions.explanation}
           </div>
-        </Card>
+        </div>
 
-        <Card title="What to expect">
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/5 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-3">What to expect</div>
           <div className="space-y-2">
             {report.whatToExpect.map((item) => (
               <div
                 key={item}
-                className="rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-xs leading-5 text-zinc-300"
+                className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 text-sm leading-5 text-zinc-300"
               >
                 {item}
               </div>
             ))}
           </div>
-        </Card>
+        </div>
       </div>
 
       <Card title="What to avoid">
