@@ -11,7 +11,8 @@ import {
 } from "@/lib/solar"
 import { calculateSkyScore } from "@/lib/scoring"
 import { locations } from "@/lib/locations"
-import { rankLocations } from "@/lib/rank"
+import { getClosestRankedSpots } from "@/lib/geo"
+import { generateAiSunsetNarrative } from "@/lib/openai-report"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -24,6 +25,16 @@ function mphFromMs(ms?: number) {
   return Number((((ms ?? 2.7) as number) * 2.23694).toFixed(1))
 }
 
+function inferCityLabel(lat: number, lon: number) {
+  if (lat > 37.58 && lat < 37.63 && lon < -122.35 && lon > -122.42) return "Millbrae, CA"
+  if (lat > 37.45 && lat < 37.51 && lon < -122.21 && lon > -122.29) return "Redwood City, CA"
+  return "Your Area"
+}
+
+function inferRegionLabel() {
+  return "Peninsula / South San Francisco Bay"
+}
+
 function buildExplanation(input: {
   clouds: number
   humidity: number
@@ -33,15 +44,15 @@ function buildExplanation(input: {
   const parts: string[] = []
 
   if (input.clouds >= 20 && input.clouds <= 65) {
-    parts.push("useful cloud texture")
+    parts.push("balanced cloud layer for color reflection")
   } else if (input.clouds < 20) {
-    parts.push("clean sky but less cloud structure")
+    parts.push("clean sky but lighter cloud texture")
   } else {
     parts.push("heavier cloud cover risk")
   }
 
   if (input.visibilityMiles >= 8) {
-    parts.push("strong visibility")
+    parts.push("good visibility")
   } else if (input.visibilityMiles >= 5) {
     parts.push("moderate clarity")
   } else {
@@ -49,7 +60,7 @@ function buildExplanation(input: {
   }
 
   if (input.humidity >= 40 && input.humidity <= 70) {
-    parts.push("balanced moisture for glow")
+    parts.push("balanced atmospheric softness")
   } else if (input.humidity > 70) {
     parts.push("higher humidity and possible haze")
   } else {
@@ -70,8 +81,8 @@ function buildExplanation(input: {
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url)
-    const lat = Number(url.searchParams.get("lat") ?? "37.485")
-    const lon = Number(url.searchParams.get("lon") ?? "-122.23")
+    const lat = Number(url.searchParams.get("lat") ?? "37.5985")
+    const lon = Number(url.searchParams.get("lon") ?? "-122.3872")
 
     const current = await getCurrentWeather(lat, lon)
     const forecast = await getForecastWeather(lat, lon)
@@ -90,8 +101,8 @@ export async function GET(req: Request) {
     const sunsetDate = unixSecondsToDate(sunsetUnix)
     const currentDate = unixSecondsToDate(currentUnix)
 
-    const peakStartDate = new Date(sunsetDate.getTime() - 2 * 60 * 1000)
-    const peakEndDate = new Date(sunsetDate.getTime() + 8 * 60 * 1000)
+    const peakStartDate = new Date(sunsetDate.getTime() - 5 * 60 * 1000)
+    const peakEndDate = new Date(sunsetDate.getTime() + 5 * 60 * 1000)
 
     const sunElevation = getSolarElevation(currentDate, lat, lon)
     const visibilityMiles = milesFromMeters(current.visibility)
@@ -113,35 +124,50 @@ export async function GET(req: Request) {
       afterglowScore,
     })
 
-    const ranked = rankLocations(locations, skyScore)
-    const curve = buildSunElevationCurve(sunsetDate, lat, lon, 45, 45, 5)
+    const closestSpots = getClosestRankedSpots(lat, lon, locations, skyScore)
 
-    const nextHours = (forecast.list ?? []).slice(0, 6).map((h) => {
-      const d = unixSecondsToDate(h.dt)
-      const elevation = getSolarElevation(d, lat, lon)
-      const visMiles = milesFromMeters(h.visibility)
-      const hourAfterglow = estimateAfterglowScore({
-        clouds: h.clouds?.all ?? 40,
-        humidity: h.main?.humidity ?? 55,
-        visibilityMiles: visMiles,
-        sunElevation: elevation,
-      })
+    const cityLabel = inferCityLabel(lat, lon)
+    const regionLabel = inferRegionLabel()
 
-      return {
-        localTime: formatWithOffset(d, timezoneOffset),
-        clouds: h.clouds?.all ?? 40,
-        humidity: h.main?.humidity ?? 55,
-        visibilityMiles: visMiles,
-        windMph: mphFromMs(h.wind?.speed),
-        elevation: Number(elevation.toFixed(2)),
-        afterglowScore: hourAfterglow,
-      }
+    const aiNarrative = await generateAiSunsetNarrative({
+      cityLabel,
+      regionLabel,
+      score: skyScore,
+      sunsetLocalTime: formatWithOffset(sunsetDate, timezoneOffset),
+      peakStart: formatWithOffset(peakStartDate, timezoneOffset),
+      peakEnd: formatWithOffset(peakEndDate, timezoneOffset),
+      afterglow: `${formatWithOffset(peakEndDate, timezoneOffset)} + ~15–20 min`,
+      explanation: buildExplanation({
+        clouds: current.clouds?.all ?? 40,
+        humidity: current.main?.humidity ?? 55,
+        visibilityMiles,
+        afterglowScore,
+      }),
+      clouds: current.clouds?.all ?? 40,
+      humidity: current.main?.humidity ?? 55,
+      visibility: visibilityMiles,
+      wind: windMph,
+      spots: closestSpots.map((spot) => ({
+        name: spot.name,
+        address: spot.address,
+        score: spot.score,
+        distanceMiles: spot.distanceMiles,
+        driveMinutes: spot.driveMinutes,
+        smellLabel: spot.smellLabel,
+        parkingLabel: spot.parkingLabel,
+        vibeLabel: spot.vibeLabel,
+        bestFor: spot.bestFor,
+        whyItWins: spot.whyItWins,
+        panoramaLabel: spot.panoramaLabel,
+        easeLabel: spot.easeLabel,
+        waterLabel: spot.waterLabel,
+      })),
     })
 
     return Response.json(
       {
-        lat,
-        lon,
+        cityLabel,
+        regionLabel,
         timezoneOffset,
         currentLocalTime: formatWithOffset(currentDate, timezoneOffset),
         sunsetLocalTime: formatWithOffset(sunsetDate, timezoneOffset),
@@ -165,9 +191,9 @@ export async function GET(req: Request) {
           sunElevation: Number(sunElevation.toFixed(2)),
           summary: current.weather?.[0]?.description ?? "unknown",
         },
-        nearbyRankedLocations: ranked,
-        elevationCurve: curve,
-        hourlyPreview: nextHours,
+        nearbyRankedLocations: closestSpots,
+        elevationCurve: buildSunElevationCurve(sunsetDate, lat, lon, 45, 45, 5),
+        aiNarrative,
         updatedAt: new Date().toISOString(),
       },
       {
@@ -183,7 +209,7 @@ export async function GET(req: Request) {
     return Response.json(
       {
         error: message,
-        hint: "Check OPENWEATHER_API_KEY and provider plan.",
+        hint: "Check OPENWEATHER_API_KEY, OPENAI_API_KEY, and route dependencies.",
       },
       { status: 500 }
     )

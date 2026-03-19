@@ -1,19 +1,24 @@
-type RankedLocation = {
+type ClosestSpot = {
   name: string
-  lat: number
-  lon: number
+  address: string
+  score: number
   spotScore: number
   scent: number
-  score: number
-  address?: string
-  smellLabel?: string
-  parkingLabel?: string
-  vibeLabel?: string
-  whyItWins?: string
-  bestFor?: string
+  smellLabel: string
+  parkingLabel: string
+  vibeLabel: string
+  bestFor: string
+  whyItWins: string
+  panoramaLabel: string
+  easeLabel: string
+  waterLabel: string
+  distanceMiles: number
+  driveMinutes: number
 }
 
 type LiveScorePayload = {
+  cityLabel?: string
+  regionLabel?: string
   skyScore: number
   afterglowScore: number
   sunsetLocalTime: string
@@ -30,106 +35,79 @@ type LiveScorePayload = {
     sunElevation: number
     summary: string
   }
-  nearbyRankedLocations: RankedLocation[]
+  nearbyRankedLocations: ClosestSpot[]
+  aiNarrative?: {
+    title: string
+    intro: string
+    whyTonightIsGood: {
+      cloudStructure: string
+      atmosphere: string
+      wind: string
+    }
+    whatToExpect: string[]
+    avoid: string[]
+    decision: {
+      goNoGo: string
+      bestMove: string
+    }
+  }
 }
 
 function getRating(score: number) {
   if (score >= 90) return "INCREDIBLE"
-  if (score >= 80) return "STRONG"
-  if (score >= 70) return "GOOD"
-  if (score >= 60) return "DECENT"
-  return "WEAK"
+  if (score >= 80) return "STRONG SUNSET POTENTIAL"
+  if (score >= 70) return "GOOD SUNSET POTENTIAL"
+  if (score >= 60) return "DECENT SUNSET POTENTIAL"
+  return "WEAK SUNSET POTENTIAL"
 }
 
 function getWorthIt(score: number) {
   return score >= 70 ? "YES" : "NO"
 }
 
-function getGoldenHourStart(sunsetLocalTime: string) {
-  return `~1 hour before ${sunsetLocalTime}`
-}
-
-function getAfterglowEnd(peakEnd: string) {
-  return `~15–20 min after ${peakEnd}`
-}
-
-function buildWhatToExpect(score: number, afterglowScore: number) {
-  const items: string[] = []
-
-  if (score >= 80) {
-    items.push("Strong gold → orange → pink gradient potential")
-  } else if (score >= 70) {
-    items.push("Good warm-toned sky with moderate color payoff")
-  } else {
-    items.push("More subtle sunset with limited dramatic color")
-  }
-
-  if (afterglowScore >= 75) {
-    items.push("Best colors likely after the sun dips below the horizon")
-  } else {
-    items.push("Color may peak closer to official sunset")
-  }
-
-  items.push("Smooth, cinematic sky more likely than chaotic storm drama")
-
-  return items
-}
-
-function buildAvoidList() {
-  return [
-    "Low valley areas with blocked western horizon",
-    "Heavy waterfront if smell or damp air is unpleasant",
-    "Leaving late and arriving after the peak window starts",
-  ]
-}
-
-function buildWhyTonightIsGood(data: LiveScorePayload) {
-  const cloudText =
-    data.liveConditions.clouds >= 20 && data.liveConditions.clouds <= 60
-      ? "Ideal cloud structure with enough texture to catch warm light"
-      : data.liveConditions.clouds < 20
-      ? "Cleaner sky with less cloud texture but strong visibility"
-      : "Heavier cloud cover adds drama but may reduce direct horizon color"
-
-  const atmosphereText =
-    data.liveConditions.visibilityMiles >= 8
-      ? "Good atmospheric clarity with strong visibility"
-      : "Moderate clarity with some softness in the air"
-
-  const windText =
-    data.liveConditions.windMph >= 3 && data.liveConditions.windMph <= 12
-      ? "Moderate wind helps keep the sky from going flat"
-      : "Wind conditions are less ideal but still workable"
-
-  return {
-    cloudStructure: cloudText,
-    atmosphere: atmosphereText,
-    wind: windText,
-  }
+function getAfterglowWindow(peakEnd: string) {
+  return `${peakEnd} + ~15–20 min`
 }
 
 export function generateSunsetReport(data: LiveScorePayload) {
-  const score = data.skyScore
-  const topSpots = data.nearbyRankedLocations ?? []
-  const bestSpot = topSpots[0]
-
   return {
+    header: {
+      title:
+        data.aiNarrative?.title ??
+        `SUNSETX REPORT — ${(data.cityLabel ?? "Your Area").toUpperCase()}`,
+      dateLabel: "Tonight",
+      regionLabel: data.regionLabel ?? "Nearby region",
+      preferenceLabel: "Closest quality spots • clean smell • low friction • easy access",
+      intro:
+        data.aiNarrative?.intro ??
+        `Tonight in ${data.cityLabel ?? "your area"}, conditions show a ${data.skyScore}/100 sunset setup with visible upside during the peak window.`,
+    },
+
     summary: {
-      score,
-      rating: getRating(score),
-      worthIt: getWorthIt(score),
+      score: data.skyScore,
+      rating: getRating(data.skyScore),
+      worthIt: getWorthIt(data.skyScore),
+      bullets: [
+        "Balanced cloud layer can help reflect color",
+        "Visibility supports a readable horizon",
+        "Atmospheric softness can enrich gradients without flattening the sky",
+      ],
     },
 
     timing: {
-      goldenHourStart: getGoldenHourStart(data.sunsetLocalTime),
-      sunset: data.sunsetLocalTime,
-      peakStart: data.peakWindow.start,
-      peakEnd: data.peakWindow.end,
-      afterglow: getAfterglowEnd(data.peakWindow.end),
-      leaveBy: "Leave 10–20 minutes before peak begins",
+      goldenHourStart: `~1 hour before ${data.sunsetLocalTime}`,
+      peakWindow: `${data.peakWindow.start} – ${data.peakWindow.end}`,
+      sunsetOfficial: data.sunsetLocalTime,
+      afterglow: getAfterglowWindow(data.peakWindow.end),
+      leaveBy: "Leave 10–20 minutes before the peak window begins",
     },
 
-    whyTonightIsGood: buildWhyTonightIsGood(data),
+    whyTonightIsGood:
+      data.aiNarrative?.whyTonightIsGood ?? {
+        cloudStructure: "Useful cloud structure can catch warm light without fully blocking the horizon.",
+        atmosphere: "Current visibility and air balance support cleaner color and readable gradients.",
+        wind: "Moderate wind helps prevent the sky from feeling dull or flat.",
+      },
 
     conditions: {
       clouds: data.liveConditions.clouds,
@@ -139,22 +117,31 @@ export function generateSunsetReport(data: LiveScorePayload) {
       explanation: data.explanation,
     },
 
-    whatToExpect: buildWhatToExpect(score, data.afterglowScore),
+    whatToExpect:
+      data.aiNarrative?.whatToExpect ?? [
+        "Strong gold → orange → pink gradient potential",
+        "Best colors likely after the sun dips below the horizon",
+        "Smooth, cinematic sky rather than chaotic storm drama",
+      ],
 
-    avoid: buildAvoidList(),
+    avoid:
+      data.aiNarrative?.avoid ?? [
+        "Blocked western horizons",
+        "Heavy waterfront if the smell or dampness hurts the experience",
+        "Leaving late and missing the real peak",
+      ],
 
-    spots: topSpots,
+    spots: data.nearbyRankedLocations,
 
-    decision: {
-      goNoGo: score >= 75 ? "GO — HIGH CONFIDENCE" : score >= 65 ? "GO — MODERATE CONFIDENCE" : "MAYBE / SKIP",
-      bestMove: bestSpot
-        ? `Go to ${bestSpot.name}. Arrive before ${data.peakWindow.start}. Stay through afterglow.`
-        : "Choose the highest-ranked nearby spot and arrive before peak.",
-    },
+    decision:
+      data.aiNarrative?.decision ?? {
+        goNoGo: data.skyScore >= 75 ? "GO — HIGH CONFIDENCE" : "GO — MODERATE CONFIDENCE",
+        bestMove: `Go to ${data.nearbyRankedLocations[0]?.name ?? "the top nearby spot"} and arrive before ${data.peakWindow.start}. Stay through afterglow.`,
+      },
 
     productInsight: {
       title: "SUNSETX core product layer",
-      items: [
+      combinedSignals: [
         "weather",
         "terrain",
         "smell",

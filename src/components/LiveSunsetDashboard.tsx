@@ -5,14 +5,15 @@ import SunsetReportWidget from "@/components/SunsetReportWidget"
 import { generateSunsetReport } from "@/lib/report"
 
 type ApiResponse = {
-  lat: number
-  lon: number
-  timezoneOffset?: number
-  currentLocalTime: string
-  sunsetLocalTime: string
-  peakWindow: { start: string; end: string }
+  cityLabel?: string
+  regionLabel?: string
   skyScore: number
   afterglowScore: number
+  sunsetLocalTime: string
+  peakWindow: {
+    start: string
+    end: string
+  }
   explanation: string
   liveConditions: {
     clouds: number
@@ -22,20 +23,8 @@ type ApiResponse = {
     sunElevation: number
     summary: string
   }
-  nearbyRankedLocations: Array<{
-    name: string
-    address?: string
-    lat: number
-    lon: number
-    spotScore: number
-    scent: number
-    score: number
-    smellLabel?: string
-    parkingLabel?: string
-    vibeLabel?: string
-    whyItWins?: string
-    bestFor?: string
-  }>
+  nearbyRankedLocations: Array<any>
+  aiNarrative?: any
   updatedAt: string
 }
 
@@ -144,7 +133,7 @@ export default function LiveSunsetDashboard() {
   return (
     <section className="rounded-[32px] border border-white/10 bg-white/5 p-8 shadow-2xl">
       <div className="text-sm uppercase tracking-[0.24em] text-zinc-500">
-        Live sunset report
+        Personalized live sunset report
       </div>
 
       <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -154,8 +143,8 @@ export default function LiveSunsetDashboard() {
           </h1>
 
           <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-300 md:text-lg">
-            A live sunset report built from sky conditions, timing, visibility,
-            atmosphere, and real viewing spots nearby.
+            Every visitor sees a live, location-aware sunset report with nearby spots,
+            timing, conditions, narrative explanation, and a clear go / no-go decision.
           </p>
         </div>
 
