@@ -1,5 +1,13 @@
-import { getOneCallWeather, unixToLocalDate } from "@/lib/openweather"
-import { buildSunElevationCurve, estimateAfterglowScore, getSolarElevation } from "@/lib/solar"
+import {
+  getOneCallWeather,
+  unixSecondsToDate,
+  formatInTimeZone,
+} from "@/lib/openweather"
+import {
+  buildSunElevationCurve,
+  estimateAfterglowScore,
+  getSolarElevation,
+} from "@/lib/solar"
 import { calculateSkyScore } from "@/lib/scoring"
 import { locations } from "@/lib/locations"
 import { rankLocations } from "@/lib/rank"
@@ -13,10 +21,6 @@ function milesFromMeters(meters?: number) {
 
 function mphFromMs(ms?: number) {
   return Number((((ms ?? 2.7) as number) * 2.23694).toFixed(1))
-}
-
-function formatLocalTime(date: Date) {
-  return date.toUTCString().slice(17, 22)
 }
 
 function buildExplanation(input: {
@@ -69,21 +73,21 @@ export async function GET(req: Request) {
 
   const data = await getOneCallWeather(lat, lon)
 
-  const timezoneOffset = data.timezone_offset ?? 0
-  const timezone = data.timezone ?? "UTC"
+  const timezone = data.timezone ?? "America/Los_Angeles"
   const current = data.current
   const hourly = data.hourly ?? []
 
-  if (!current?.sunset) {
+  if (!current?.sunset || !current?.dt) {
     return Response.json({ error: "Missing sunset data" }, { status: 500 })
   }
 
-  const sunsetLocal = unixToLocalDate(current.sunset, timezoneOffset)
-  const peakStart = new Date(sunsetLocal.getTime() - 2 * 60 * 1000)
-  const peakEnd = new Date(sunsetLocal.getTime() + 8 * 60 * 1000)
+  const sunsetDate = unixSecondsToDate(current.sunset)
+  const currentDate = unixSecondsToDate(current.dt)
 
-  const localNow = unixToLocalDate(current.dt, timezoneOffset)
-  const sunElevation = getSolarElevation(localNow, lat, lon)
+  const peakStartDate = new Date(sunsetDate.getTime() - 2 * 60 * 1000)
+  const peakEndDate = new Date(sunsetDate.getTime() + 8 * 60 * 1000)
+
+  const sunElevation = getSolarElevation(currentDate, lat, lon)
   const visibilityMiles = milesFromMeters(current.visibility)
   const windMph = mphFromMs(current.wind_speed)
 
@@ -104,10 +108,10 @@ export async function GET(req: Request) {
   })
 
   const ranked = rankLocations(locations, skyScore)
-  const curve = buildSunElevationCurve(sunsetLocal, lat, lon, 45, 45, 5)
+  const curve = buildSunElevationCurve(sunsetDate, lat, lon, 45, 45, 5)
 
   const nextHours = hourly.slice(0, 6).map((h) => {
-    const d = unixToLocalDate(h.dt, timezoneOffset)
+    const d = unixSecondsToDate(h.dt)
     const elevation = getSolarElevation(d, lat, lon)
     const visMiles = milesFromMeters(h.visibility)
     const hourAfterglow = estimateAfterglowScore({
@@ -118,7 +122,7 @@ export async function GET(req: Request) {
     })
 
     return {
-      localTime: formatLocalTime(d),
+      localTime: formatInTimeZone(d, timezone),
       clouds: h.clouds ?? 40,
       humidity: h.humidity ?? 55,
       visibilityMiles: visMiles,
@@ -133,12 +137,11 @@ export async function GET(req: Request) {
       lat,
       lon,
       timezone,
-      timezoneOffset,
-      currentLocalTime: formatLocalTime(localNow),
-      sunsetLocalTime: formatLocalTime(sunsetLocal),
+      currentLocalTime: formatInTimeZone(currentDate, timezone),
+      sunsetLocalTime: formatInTimeZone(sunsetDate, timezone),
       peakWindow: {
-        start: formatLocalTime(peakStart),
-        end: formatLocalTime(peakEnd),
+        start: formatInTimeZone(peakStartDate, timezone),
+        end: formatInTimeZone(peakEndDate, timezone),
       },
       skyScore,
       afterglowScore,

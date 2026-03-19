@@ -55,11 +55,15 @@ export async function getOneCallWeather(lat: number, lon: number): Promise<OneCa
   return (await res.json()) as OneCallResponse
 }
 
-export function unixToLocalDate(unixSeconds: number, timezoneOffsetSeconds: number) {
-  return new Date((unixSeconds + timezoneOffsetSeconds) * 1000)
+export function unixSecondsToDate(unixSeconds: number) {
+  return new Date(unixSeconds * 1000)
 }
 
-export function formatLocalClock(unixSeconds: number, timezoneOffsetSeconds: number) {
-  const d = unixToLocalDate(unixSeconds, timezoneOffsetSeconds)
-  return d.toUTCString().slice(17, 22)
+export function formatInTimeZone(date: Date, timeZone: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(date)
 }
