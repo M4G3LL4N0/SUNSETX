@@ -86,8 +86,29 @@ export default function GlobalSunsetBoard() {
 
   if (!board) {
     return (
-      <section className="mt-16 rounded-[28px] border border-white/10 bg-white/5 p-8 shadow-2xl">
-        <div className="text-sm text-zinc-400">Loading global sunset board…</div>
+      <section className="mt-8 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-4 md:p-6 shadow-lg backdrop-blur-xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">
+              Global sunset board
+            </div>
+            <div className="h-8 w-48 bg-white/[0.08] rounded animate-pulse" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-4 backdrop-blur-xl">
+              <div className="space-y-3">
+                {[...Array(3)].map((_, j) => (
+                  <div key={j} className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3">
+                    <div className="h-5 w-32 bg-white/[0.08] rounded mb-2" />
+                    <div className="h-4 w-full bg-white/[0.08] rounded" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
     )
   }

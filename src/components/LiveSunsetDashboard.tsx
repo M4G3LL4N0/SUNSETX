@@ -272,11 +272,26 @@ export default function LiveSunsetDashboard() {
 
   if (!data || !report) {
     return (
-      <section className="rounded-[32px] border border-white/10 bg-white/5 p-6 backdrop-blur-2xl">
-        <div className="text-sm text-zinc-400">Loading SUNSETX live engine…</div>
-      </section>
-    )
-  }
+      <section className="overflow-hidden rounded-[28px] border border-white/[0.08] bg-gradient-to-b from-black/30 via-black/20 to-black/10 p-5 md:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-xl">
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center rounded-full bg-gradient-to-r from-violet-400/10 to-fuchsia-400/10 px-3 py-1 text-[11px] font-medium tracking-wide text-violet-100 ring-1 ring-violet-400/20 backdrop-blur-xl">
+            Loading live data
+          </div>
+          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-100 via-fuchsia-100 to-amber-100 mt-3">
+            SUNSETX
+          </h1>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-3 shadow-lg backdrop-blur-xl animate-pulse">
+              <div className="h-4 w-16 bg-white/[0.08] rounded mb-2" />
+              <div className="h-6 w-24 bg-white/[0.08] rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
 
   const topSpot = data.nearbyRankedLocations?.[0]
 
