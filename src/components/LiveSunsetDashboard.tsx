@@ -330,28 +330,40 @@ export default function LiveSunsetDashboard() {
 
       {/* Conditions Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
-        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-3 shadow-lg backdrop-blur-xl">
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-cyan-400/5 via-violet-400/5 to-transparent p-3 shadow-lg backdrop-blur-xl">
           <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Clouds</div>
-          <div className="text-lg font-medium text-white">{data.liveConditions.clouds}%</div>
-          <div className="mt-0.5 text-xs text-zinc-400">Coverage</div>
+          <div className="flex items-baseline gap-1">
+            <div className="text-lg font-medium text-white">{data.liveConditions.clouds}</div>
+            <div className="text-sm text-zinc-400">%</div>
+          </div>
+          <div className="mt-1 text-xs text-zinc-400">Coverage</div>
         </div>
 
-        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-3 shadow-lg backdrop-blur-xl">
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/5 via-fuchsia-400/5 to-transparent p-3 shadow-lg backdrop-blur-xl">
           <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Visibility</div>
-          <div className="text-lg font-medium text-white">{data.liveConditions.visibilityMiles} mi</div>
-          <div className="mt-0.5 text-xs text-zinc-400">Range</div>
+          <div className="flex items-baseline gap-1">
+            <div className="text-lg font-medium text-white">{data.liveConditions.visibilityMiles}</div>
+            <div className="text-sm text-zinc-400">mi</div>
+          </div>
+          <div className="mt-1 text-xs text-zinc-400">Range</div>
         </div>
 
-        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-3 shadow-lg backdrop-blur-xl">
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-fuchsia-400/5 via-amber-400/5 to-transparent p-3 shadow-lg backdrop-blur-xl">
           <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Humidity</div>
-          <div className="text-lg font-medium text-white">{data.liveConditions.humidity}%</div>
-          <div className="mt-0.5 text-xs text-zinc-400">Current</div>
+          <div className="flex items-baseline gap-1">
+            <div className="text-lg font-medium text-white">{data.liveConditions.humidity}</div>
+            <div className="text-sm text-zinc-400">%</div>
+          </div>
+          <div className="mt-1 text-xs text-zinc-400">Current</div>
         </div>
 
-        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-3 shadow-lg backdrop-blur-xl">
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-amber-400/5 via-orange-400/5 to-transparent p-3 shadow-lg backdrop-blur-xl">
           <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Wind</div>
-          <div className="text-lg font-medium text-white">{data.liveConditions.windMph} mph</div>
-          <div className="mt-0.5 text-xs text-zinc-400">Speed</div>
+          <div className="flex items-baseline gap-1">
+            <div className="text-lg font-medium text-white">{data.liveConditions.windMph}</div>
+            <div className="text-sm text-zinc-400">mph</div>
+          </div>
+          <div className="mt-1 text-xs text-zinc-400">Speed</div>
         </div>
       </div>
 
