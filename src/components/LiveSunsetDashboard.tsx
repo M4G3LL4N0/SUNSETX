@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import SunsetReportWidget from "@/components/SunsetReportWidget"
 import EnableNotifications from "@/components/EnableNotifications"
 import ShareLiveCard from "@/components/ShareLiveCard"
@@ -344,6 +344,14 @@ export default function LiveSunsetDashboard() {
 
   return (
     <section className="overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl md:p-6">
+      {/* DEBUG INFO */}
+      <div className="mb-4 flex flex-wrap gap-2 text-xs">
+        <Pill>Lat: {coords.lat}</Pill>
+        <Pill>Lon: {coords.lon}</Pill>
+        <Pill>{fallbackMode ? "Fallback Mode" : "Live GPS Active"}</Pill>
+        <Pill>Spots: {data.nearbyRankedLocations.length}</Pill>
+      </div>
+
       <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <div className="text-[11px] uppercase tracking-[0.28em] text-zinc-400">
