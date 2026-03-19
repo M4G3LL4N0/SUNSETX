@@ -32,22 +32,34 @@ export async function GET() {
         <div
           style={{
             display: "flex",
-            fontSize: 80,
+            fontSize: 96,
             fontWeight: 800,
             marginTop: 16,
           }}
         >
-          Tonight’s Sunset
+          82 🔥
         </div>
 
         <div
           style={{
             display: "flex",
-            fontSize: 48,
-            marginTop: 16,
+            fontSize: 28,
+            marginTop: 12,
+            opacity: 0.85,
           }}
         >
-          Check your live score
+          Tonight is worth it
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            fontSize: 24,
+            marginTop: 10,
+            opacity: 0.75,
+          }}
+        >
+          Peak: 6:38 PM – 6:48 PM
         </div>
       </div>
     ),
