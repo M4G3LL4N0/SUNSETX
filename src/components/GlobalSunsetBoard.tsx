@@ -24,32 +24,36 @@ type SectionProps = {
 
 function Section({ title, items }: SectionProps) {
   return (
-    <div className="rounded-3xl border border-white/5 bg-white/[0.02] p-8 backdrop-blur-sm">
-      <div className="text-sm font-semibold text-zinc-300 uppercase tracking-wider mb-6">
+    <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-4 backdrop-blur-xl">
+      <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-4">
         {title}
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-3">
         {items.map((item, index) => (
           <div
             key={`${title}-${item.city}-${item.country}`}
-            className="rounded-2xl border border-white/5 bg-gradient-to-br from-white/[0.02] to-white/[0.06] p-6 hover:bg-white/[0.08] transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-white/5"
+            className="rounded-xl border border-white/[0.08] bg-gradient-to-br from-white/[0.03] to-transparent p-3 hover:bg-white/[0.04] transition-colors"
           >
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="text-xs text-zinc-500 font-medium mb-2">#{index + 1}</div>
-                <div className="text-2xl font-semibold text-white mb-3">
-                  {item.city}, {item.country}
+                <div className="flex items-baseline gap-2 mb-2">
+                  <div className="text-lg font-medium text-white">
+                    {item.city}
+                  </div>
+                  <div className="text-sm text-zinc-400">
+                    {item.country}
+                  </div>
                 </div>
-                <p className="text-base leading-relaxed text-zinc-300">
+                <p className="text-sm leading-5 text-zinc-300">
                   {item.why}
                 </p>
               </div>
-              <div className="flex-shrink-0 text-center md:text-right">
-                <div className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-300 to-orange-200">
+              <div className="flex-shrink-0 text-right">
+                <div className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-100 to-fuchsia-100">
                   {item.score}
                 </div>
-                <div className="text-xs uppercase tracking-wider text-zinc-500 mt-2">Score</div>
+                <div className="text-[11px] uppercase tracking-wide text-zinc-500 mt-1">Score</div>
               </div>
             </div>
           </div>
@@ -89,23 +93,23 @@ export default function GlobalSunsetBoard() {
   }
 
   return (
-    <section className="mt-16 rounded-[28px] border border-white/10 bg-white/5 p-8 md:p-12 shadow-2xl backdrop-blur-sm">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+    <section className="mt-8 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-4 md:p-6 shadow-lg backdrop-blur-xl">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <div className="text-xs uppercase tracking-[0.24em] text-zinc-500">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">
             Global sunset board
           </div>
-          <h2 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-300 via-pink-200 to-orange-200">
-            Best sunset windows across the world
+          <h2 className="text-2xl font-medium text-white">
+            Best sunset windows worldwide
           </h2>
         </div>
 
-        <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-zinc-400 whitespace-nowrap self-start md:self-auto">
+        <div className="rounded-full border border-white/[0.08] bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-zinc-400">
           Updated {new Date(board.updatedAt).toLocaleTimeString()}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         <Section title="Today" items={board.today} />
         <Section title="Tomorrow" items={board.tomorrow} />
         <Section title="This week" items={board.week} />
