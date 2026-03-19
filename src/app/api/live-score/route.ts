@@ -12,7 +12,6 @@ import {
 import { calculateSkyScore } from "@/lib/scoring"
 import { locations } from "@/lib/locations"
 import { getClosestRankedSpots } from "@/lib/geo"
-import { generateAiSunsetNarrative } from "@/lib/openai-report"
 import { getUserPreferences, personalizeSpotScore } from "@/lib/preferences"
 
 export const dynamic = "force-dynamic"
@@ -44,23 +43,86 @@ function buildExplanation(input: {
 }) {
   const parts: string[] = []
 
-  if (input.clouds >= 20 && input.clouds <= 65) parts.push("balanced cloud layer for color reflection")
-  else if (input.clouds < 20) parts.push("clean sky but lighter cloud texture")
-  else parts.push("heavier cloud cover risk")
+  if (input.clouds >= 20 && input.clouds <= 65) {
+    parts.push("balanced cloud layer for color reflection")
+  } else if (input.clouds < 20) {
+    parts.push("clean sky but lighter cloud texture")
+  } else {
+    parts.push("heavier cloud cover risk")
+  }
 
-  if (input.visibilityMiles >= 8) parts.push("good visibility")
-  else if (input.visibilityMiles >= 5) parts.push("moderate clarity")
-  else parts.push("lower clarity")
+  if (input.visibilityMiles >= 8) {
+    parts.push("good visibility")
+  } else if (input.visibilityMiles >= 5) {
+    parts.push("moderate clarity")
+  } else {
+    parts.push("lower clarity")
+  }
 
-  if (input.humidity >= 40 && input.humidity <= 70) parts.push("balanced atmospheric softness")
-  else if (input.humidity > 70) parts.push("higher humidity and possible haze")
-  else parts.push("drier atmosphere")
+  if (input.humidity >= 40 && input.humidity <= 70) {
+    parts.push("balanced atmospheric softness")
+  } else if (input.humidity > 70) {
+    parts.push("higher humidity and possible haze")
+  } else {
+    parts.push("drier atmosphere")
+  }
 
-  if (input.afterglowScore >= 75) parts.push("high afterglow potential")
-  else if (input.afterglowScore >= 55) parts.push("good afterglow potential")
-  else parts.push("limited afterglow upside")
+  if (input.afterglowScore >= 75) {
+    parts.push("high afterglow potential")
+  } else if (input.afterglowScore >= 55) {
+    parts.push("good afterglow potential")
+  } else {
+    parts.push("limited afterglow upside")
+  }
 
   return parts.join(" · ")
+}
+
+function buildFallbackNarrative(input: {
+  cityLabel: string
+  score: number
+  sunsetLocalTime: string
+  peakStart: string
+  peakEnd: string
+  explanation: string
+  topSpotName?: string
+}) {
+  const rating =
+    input.score >= 90
+      ? "incredible"
+      : input.score >= 80
+      ? "strong"
+      : input.score >= 70
+      ? "good"
+      : input.score >= 60
+      ? "decent"
+      : "weak"
+
+  return {
+    title: `SUNSETX REPORT — ${input.cityLabel.toUpperCase()}`,
+    intro: `Tonight in ${input.cityLabel}, sunset conditions look ${rating}, with a SUNSETX score of ${input.score}/100 and a projected peak window from ${input.peakStart} to ${input.peakEnd}.`,
+    whyTonightIsGood: {
+      cloudStructure: "Useful cloud texture can help catch warm light without fully blocking the horizon.",
+      atmosphere: "Visibility and atmospheric softness are balanced enough for color to show cleanly.",
+      wind: "Moderate wind can help keep the sky from feeling flat and muddy.",
+    },
+    whatToExpect: [
+      "Warm gold, orange, and pink gradient potential",
+      "Best colors likely after the sun dips below the horizon",
+      "A smoother cinematic sky rather than chaotic storm drama",
+    ],
+    avoid: [
+      "Blocked western horizons",
+      "Leaving too late and missing the peak",
+      "Low-value spots with poor panorama or awkward access",
+    ],
+    decision: {
+      goNoGo: input.score >= 75 ? "GO — HIGH CONFIDENCE" : "GO — MODERATE CONFIDENCE",
+      bestMove: `Go to ${input.topSpotName ?? "the top nearby spot"} and arrive before ${input.peakStart}.`,
+    },
+    source: "fallback",
+    explanation: input.explanation,
+  }
 }
 
 export async function GET(req: Request) {
@@ -79,7 +141,10 @@ export async function GET(req: Request) {
     const currentUnix = current.dt
 
     if (!sunsetUnix || !currentUnix) {
-      return Response.json({ error: "Missing sunset data from weather provider" }, { status: 500 })
+      return Response.json(
+        { error: "Missing sunset data from weather provider" },
+        { status: 500 }
+      )
     }
 
     const sunsetDate = unixSecondsToDate(sunsetUnix)
@@ -119,39 +184,21 @@ export async function GET(req: Request) {
     const cityLabel = inferCityLabel(lat, lon)
     const regionLabel = inferRegionLabel()
 
-    const aiResult = await generateAiSunsetNarrative({
+    const explanation = buildExplanation({
+      clouds: current.clouds?.all ?? 40,
+      humidity: current.main?.humidity ?? 55,
+      visibilityMiles,
+      afterglowScore,
+    })
+
+    const aiNarrative = buildFallbackNarrative({
       cityLabel,
-      regionLabel,
       score: skyScore,
       sunsetLocalTime: formatWithOffset(sunsetDate, timezoneOffset),
       peakStart: formatWithOffset(peakStartDate, timezoneOffset),
       peakEnd: formatWithOffset(peakEndDate, timezoneOffset),
-      afterglow: `${formatWithOffset(peakEndDate, timezoneOffset)} + ~15–20 min`,
-      explanation: buildExplanation({
-        clouds: current.clouds?.all ?? 40,
-        humidity: current.main?.humidity ?? 55,
-        visibilityMiles,
-        afterglowScore,
-      }),
-      clouds: current.clouds?.all ?? 40,
-      humidity: current.main?.humidity ?? 55,
-      visibility: visibilityMiles,
-      wind: windMph,
-      spots: closestSpots.map((spot) => ({
-        name: spot.name,
-        address: spot.address,
-        score: spot.score,
-        distanceMiles: spot.distanceMiles,
-        driveMinutes: spot.driveMinutes,
-        smellLabel: spot.smellLabel,
-        parkingLabel: spot.parkingLabel,
-        vibeLabel: spot.vibeLabel,
-        bestFor: spot.bestFor,
-        whyItWins: spot.whyItWins,
-        panoramaLabel: spot.panoramaLabel,
-        easeLabel: spot.easeLabel,
-        waterLabel: spot.waterLabel,
-      })),
+      explanation,
+      topSpotName: closestSpots[0]?.name,
     })
 
     return Response.json(
@@ -168,12 +215,7 @@ export async function GET(req: Request) {
         },
         skyScore,
         afterglowScore,
-        explanation: buildExplanation({
-          clouds: current.clouds?.all ?? 40,
-          humidity: current.main?.humidity ?? 55,
-          visibilityMiles,
-          afterglowScore,
-        }),
+        explanation,
         liveConditions: {
           clouds: current.clouds?.all ?? 40,
           humidity: current.main?.humidity ?? 55,
@@ -184,8 +226,8 @@ export async function GET(req: Request) {
         },
         nearbyRankedLocations: closestSpots,
         elevationCurve: buildSunElevationCurve(sunsetDate, lat, lon, 45, 45, 5),
-        aiNarrative: aiResult.data,
-        aiStatus: aiResult.status,
+        aiNarrative,
+        aiStatus: "fallback",
         updatedAt: new Date().toISOString(),
       },
       {

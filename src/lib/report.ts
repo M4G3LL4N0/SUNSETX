@@ -1,4 +1,5 @@
 type ClosestSpot = {
+  id?: string
   name: string
   address: string
   score: number
@@ -131,7 +132,7 @@ export function generateSunsetReport(data: LiveScorePayload) {
         "Leaving late and missing the real peak",
       ],
 
-    spots: data.nearbyRankedLocations,
+    spots: data.nearbyRankedLocations.slice(0, 3),
 
     decision:
       data.aiNarrative?.decision ?? {

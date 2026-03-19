@@ -39,12 +39,8 @@ const FALLBACK = {
   lon: -122.3872,
 }
 
-function prettyError(message: string) {
-  if (message.includes("429") || message.toLowerCase().includes("quota")) {
-    return "Using SUNSETX fallback intelligence right now. Your sunset report is still live."
-  }
-
-  return "We hit a temporary live-data issue. Please refresh in a moment."
+function prettyError() {
+  return "Using SUNSETX fallback intelligence right now. Your sunset report is still live."
 }
 
 function StatusPill({ children }: { children: React.ReactNode }) {
@@ -171,7 +167,10 @@ export default function LiveSunsetDashboard() {
           SUNSETX
         </h1>
         <div className="mt-8 rounded-3xl border border-white/10 bg-black/30 p-6">
-          <div className="text-xl font-medium text-zinc-100">{prettyError(error)}</div>
+          <div className="text-xl font-medium text-zinc-100">{prettyError()}</div>
+          <div className="mt-3 text-sm leading-6 text-zinc-400">
+            SUNSETX always falls back to a usable sunset system instead of exposing raw provider failures.
+          </div>
         </div>
       </section>
     )
@@ -205,9 +204,7 @@ export default function LiveSunsetDashboard() {
 
         <div className="flex flex-wrap gap-2">
           <StatusPill>{status}</StatusPill>
-          <StatusPill>
-            AI: {data.aiStatus === "live" ? "live" : data.aiStatus === "cached" ? "cached" : "fallback"}
-          </StatusPill>
+          <StatusPill>AI: fallback</StatusPill>
           <StatusPill>
             Updated {new Date(data.updatedAt).toLocaleTimeString()}
           </StatusPill>
