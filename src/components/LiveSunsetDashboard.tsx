@@ -1,12 +1,15 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import SunsetReportWidget from "@/components/SunsetReportWidget"
+import EnableNotifications from "@/components/EnableNotifications"
 import { generateSunsetReport } from "@/lib/report"
+import { getLeaveNowStatus } from "@/lib/leave-now"
 
 type ApiResponse = {
   cityLabel?: string
   regionLabel?: string
+  timezoneOffset?: number
   skyScore: number
   afterglowScore: number
   sunsetLocalTime: string
@@ -113,6 +116,18 @@ export default function LiveSunsetDashboard() {
     }
   }, [coords.lat, coords.lon])
 
+  const report = useMemo(() => (data ? generateSunsetReport(data) : null), [data])
+
+  const leaveNow = useMemo(() => {
+    const top = data?.nearbyRankedLocations?.[0]
+    if (!top || !data) return null
+
+    return getLeaveNowStatus({
+      peakStart: data.peakWindow.start,
+      driveMinutes: top.driveMinutes ?? 10,
+    })
+  }, [data])
+
   if (error) {
     return (
       <section className="rounded-[32px] border border-red-500/20 bg-red-500/5 p-8">
@@ -121,15 +136,13 @@ export default function LiveSunsetDashboard() {
     )
   }
 
-  if (!data) {
+  if (!data || !report) {
     return (
       <section className="rounded-[32px] border border-white/10 bg-white/5 p-8">
         <div className="text-sm text-zinc-400">Loading SUNSETX live engine…</div>
       </section>
     )
   }
-
-  const report = generateSunsetReport(data)
 
   return (
     <section className="rounded-[32px] border border-white/10 bg-white/5 p-8 shadow-2xl">
@@ -160,6 +173,27 @@ export default function LiveSunsetDashboard() {
             Updated {new Date(data.updatedAt).toLocaleTimeString()}
           </span>
         </div>
+      </div>
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+          <div className="text-sm font-medium text-zinc-100">Leave-now engine</div>
+          <div className="mt-2 text-sm text-zinc-400">
+            {leaveNow?.copy ?? "Leave timing unavailable."}
+          </div>
+          {leaveNow?.leaveAt ? (
+            <div className="mt-3 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300 inline-flex">
+              Ideal leave time: {leaveNow.leaveAt}
+            </div>
+          ) : null}
+        </div>
+
+        <EnableNotifications
+          lat={coords.lat}
+          lon={coords.lon}
+          cityLabel={data.cityLabel}
+          timezoneOffset={data.timezoneOffset}
+        />
       </div>
 
       <SunsetReportWidget report={report} />

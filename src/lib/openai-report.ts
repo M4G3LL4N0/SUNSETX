@@ -1,4 +1,5 @@
 import OpenAI from "openai"
+import { getCachedAiSummary, setCachedAiSummary } from "@/lib/ai-cache"
 
 const apiKey = process.env.OPENAI_API_KEY
 
@@ -22,6 +23,32 @@ type Spot = {
   waterLabel: string
 }
 
+function buildCacheKey(input: {
+  cityLabel: string
+  score: number
+  sunsetLocalTime: string
+  peakStart: string
+  peakEnd: string
+  clouds: number
+  humidity: number
+  visibility: number
+  wind: number
+  topSpot: string
+}) {
+  return [
+    input.cityLabel,
+    input.score,
+    input.sunsetLocalTime,
+    input.peakStart,
+    input.peakEnd,
+    input.clouds,
+    input.humidity,
+    input.visibility,
+    input.wind,
+    input.topSpot,
+  ].join("|")
+}
+
 export async function generateAiSunsetNarrative(input: {
   cityLabel: string
   regionLabel: string
@@ -37,6 +64,24 @@ export async function generateAiSunsetNarrative(input: {
   wind: number
   spots: Spot[]
 }) {
+  const cacheKey = buildCacheKey({
+    cityLabel: input.cityLabel,
+    score: input.score,
+    sunsetLocalTime: input.sunsetLocalTime,
+    peakStart: input.peakStart,
+    peakEnd: input.peakEnd,
+    clouds: input.clouds,
+    humidity: input.humidity,
+    visibility: input.visibility,
+    wind: input.wind,
+    topSpot: input.spots[0]?.name ?? "none",
+  })
+
+  const cached = await getCachedAiSummary(cacheKey)
+  if (cached) {
+    return cached
+  }
+
   if (!client) {
     return null
   }
@@ -117,7 +162,17 @@ export async function generateAiSunsetNarrative(input: {
     })
 
     const text = response.output_text
-    return JSON.parse(text)
+    const parsed = JSON.parse(text)
+
+    await setCachedAiSummary({
+      cacheKey,
+      cityLabel: input.cityLabel,
+      regionLabel: input.regionLabel,
+      summary: parsed,
+      ttlMinutes: 45,
+    })
+
+    return parsed
   } catch (error) {
     console.error("OpenAI narrative fallback triggered:", error)
     return null
