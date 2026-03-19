@@ -75,8 +75,6 @@ export default function PerfectSunsetFramework() {
           </div>
         ))}
       </div>
-        Updated {new Date(data.updatedAt).toLocaleTimeString()}
-      </div>
     </section>
   )
 }
