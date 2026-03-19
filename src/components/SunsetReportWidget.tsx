@@ -8,7 +8,8 @@ type Spot = {
   spotScore: number
   scent: number
   smellLabel: string
-  parkingLabel: string  vibeLabel: string
+  parkingLabel: string
+  vibeLabel: string
   bestFor: string
   whyItWins: string
   panoramaLabel: string
@@ -27,7 +28,8 @@ type Report = {
     intro: string
   }
   summary: {
-    score: number    rating: string
+    score: number
+    rating: string
     worthIt: string
     bullets: string[]
   }
@@ -39,8 +41,10 @@ type Report = {
     leaveBy: string
   }
   whyTonightIsGood: {
-    cloudStructure: string    atmosphere: string
-    wind: string  }
+    cloudStructure: string
+    atmosphere: string
+    wind: string
+  }
   conditions: {
     clouds: number
     humidity: number
@@ -56,14 +60,15 @@ type Report = {
     bestMove: string
   }
   productInsight: {
-    title: string    combinedSignals: string[]
+    title: string
+    combinedSignals: string[]
     becomes: string[]
   }
 }
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full border border-white/20 bg-white/5 px-2.5 py-1 text-[10px] font-medium text-zinc-200">
+    <span className="rounded-full border border-white/20 bg-white/5 px-2 py-0.5 text-[9px] font-medium text-zinc-200">
       {children}
     </span>
   )
@@ -76,12 +81,13 @@ function Card({
 }: {
   title: string
   children: React.ReactNode
-  className?: string}) {
+  className?: string
+}) {
   return (
-    <div className={`rounded-[20px] border border-white/10 bg-white/[0.03] p-4 backdrop-blur-sm ${className}`}>
+    <div className={`rounded-[20px] border border-white/10 bg-white/[0.03] p-3 backdrop-blur-sm ${className}`}>
       {title && (
-        <div className="mb-3 flex items-center gap-2">
-          <h3 className="text-[12px] uppercase tracking-[0.15em] font-medium text-zinc-400">
+        <div className="mb-2 flex items-center gap-2">
+          <h3 className="text-[11px] uppercase tracking-[0.15em] font-medium text-zinc-400">
             {title}
           </h3>
         </div>
@@ -93,8 +99,8 @@ function Card({
 
 function SpotCard({ spot, index }: { spot: Spot; index: number }) {
   return (
-    <div className="rounded-[20px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-sm">
-      <div className="space-y-4">
+    <div className="rounded-[20px] border border-white/10 bg-white/[0.04] p-3 backdrop-blur-sm">
+      <div className="space-y-3">
         <div className="flex items-start justify-between">
           <div className="flex-1 space-y-1">
             <div className="text-xs text-zinc-500">Spot #{index + 1}</div>
@@ -109,7 +115,7 @@ function SpotCard({ spot, index }: { spot: Spot; index: number }) {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-2">
+        <div className="flex flex-wrap gap-1.5 mb-2">
           <Chip>{spot.distanceMiles} mi</Chip>
           <Chip>~{spot.driveMinutes} min</Chip>
           <Chip>{spot.smellLabel}</Chip>
@@ -117,7 +123,7 @@ function SpotCard({ spot, index }: { spot: Spot; index: number }) {
           <Chip>{spot.vibeLabel}</Chip>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid gap-2 md:grid-cols-2">
           <div>
             <div className="text-xs uppercase tracking-[0.15em] text-zinc-500">Panorama</div>
             <div className="mt-1 text-sm text-zinc-300">{spot.panoramaLabel}</div>
@@ -136,7 +142,7 @@ function SpotCard({ spot, index }: { spot: Spot; index: number }) {
           </div>
         </div>
 
-        <div className="mt-3">
+        <div className="mt-2">
           <div className="text-xs uppercase tracking-[0.15em] text-zinc-500">Why it wins</div>
           <div className="mt-1 text-sm text-zinc-300">{spot.whyItWins}</div>
         </div>
@@ -148,13 +154,13 @@ function SpotCard({ spot, index }: { spot: Spot; index: number }) {
 export default function SunsetReportWidget({ report }: { report: Report | null }) {
   if (!report) return null;
   return (
-    <section className="mt-6 space-y-5">
+    <section className="mt-4 space-y-4">
       {/* Header: Overall Score */}
       <Card>
-        <div className="flex items-baseline gap-4">
+        <div className="flex items-baseline gap-3">
           <div className="text-4xl font-bold tracking-tight">{report.summary.score}</div>
           <div className="flex-1 space-y-2">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               <Chip>{report.summary.rating}</Chip>
               <Chip>Worth it: {report.summary.worthIt}</Chip>
             </div>
@@ -172,7 +178,7 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
 
       {/* Timeline */}
       <Card title="Timeline">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div className="text-center">
             <div className="text-xs uppercase tracking-[0.15em] text-zinc-500">Golden hour</div>
             <div className="mt-1 text-sm font-medium">{report.timing.goldenHourStart}</div>
@@ -190,14 +196,14 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
             <div className="mt-1 text-sm font-medium">{report.timing.afterglow}</div>
           </div>
         </div>
-        <div className="mt-4 text-center text-xs text-zinc-400">
+        <div className="mt-3 text-center text-xs text-zinc-400">
           {report.timing.leaveBy}
         </div>
       </Card>
 
       {/* Why Tonight Is Good */}
       <Card title="Why Tonight Is Good">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-3">
           <div>
             <div className="text-xs uppercase tracking-[0.15em] text-zinc-500">Cloud structure</div>
             <div className="mt-1 text-sm text-zinc-300">{report.whyTonightIsGood.cloudStructure}</div>
@@ -215,7 +221,7 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
 
       {/* Live Sunset Intelligence */}
       <Card title="Live Sunset Intelligence">
-        <div className="flex flex-wrap gap-3 mb-4">
+        <div className="flex flex-wrap gap-2 mb-3">
           <Chip>Clouds {report.conditions.clouds}%</Chip>
           <Chip>Humidity {report.conditions.humidity}%</Chip>
           <Chip>Visibility {report.conditions.visibility} mi</Chip>
@@ -230,7 +236,7 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
       <Card title="What to Expect">
         <div className="space-y-2">
           {report.whatToExpect.map((item) => (
-            <div key={item} className="rounded-[16px] border border-white/10 bg-white/[0.02] p-3 text-xs text-zinc-300">
+            <div key={item} className="rounded-[16px] border border-white/10 bg-white/[0.02] p-2.5 text-xs text-zinc-300">
               {item}
             </div>
           ))}
@@ -241,7 +247,7 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
       <Card title="What to Avoid">
         <div className="space-y-2">
           {report.avoid.map((item) => (
-            <div key={item} className="rounded-[16px] border border-white/10 bg-white/[0.02] p-3 text-xs text-zinc-300">
+            <div key={item} className="rounded-[16px] border border-white/10 bg-white/[0.02] p-2.5 text-xs text-zinc-300">
               {item}
             </div>
           ))}
@@ -249,11 +255,11 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
       </Card>
 
       {/* Top Sunset Spots */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         <h3 className="text-[12px] uppercase tracking-[0.24em] text-zinc-500">
           Top sunset spots
         </h3>
-        <div className="grid gap-4">
+        <div className="grid gap-3 sm:grid-cols-1">
           {report.spots.slice(0, 3).map((spot, index) => (
             <SpotCard key={`${spot.name}-${index}`} spot={spot} index={index} />
           ))}
@@ -270,17 +276,17 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
 
       {/* Product Insight */}
       <Card title={report.productInsight.title}>
-        <div className="mb-3">
+        <div className="mb-2">
           <div className="text-xs uppercase tracking-[0.15em] text-zinc-500">Combined signals</div>
-          <div className="mt-1 flex flex-wrap gap-2">
+          <div className="mt-1 flex flex-wrap gap-1.5">
             {report.productInsight.combinedSignals.map((item) => (
               <Chip key={item}>{item}</Chip>
             ))}
           </div>
         </div>
-        <div className="mt-4">
+        <div className="mt-3">
           <div className="text-xs uppercase tracking-[0.15em] text-zinc-500">This becomes</div>
-          <div className="mt-1 flex flex-wrap gap-2">
+          <div className="mt-1 flex flex-wrap gap-1.5">
             {report.productInsight.becomes.map((item) => (
               <Chip key={item}>{item}</Chip>
             ))}
