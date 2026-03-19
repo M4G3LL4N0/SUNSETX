@@ -3,7 +3,13 @@ import { ImageResponse } from "next/og"
 
 export const runtime = "edge"
 
-export async function GET() {
+export async function GET(req: Request) {
+  const url = new URL(req.url)
+  const city = url.searchParams.get("city") ?? "Your Area"
+  const score = url.searchParams.get("score") ?? "82"
+  const peak = url.searchParams.get("peak") ?? "6:38 PM – 6:48 PM"
+  const bestSpot = url.searchParams.get("spot") ?? "Top nearby spot"
+
   return new ImageResponse(
     (
       <div
@@ -12,54 +18,47 @@ export async function GET() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#000000",
+          alignItems: "flex-start",
+          padding: "72px",
+          background:
+            "linear-gradient(180deg, #050505 0%, #111111 45%, #1d1208 100%)",
           color: "#ffffff",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            fontSize: 42,
-            fontWeight: 700,
-            letterSpacing: 2,
-          }}
-        >
+        <div style={{ display: "flex", fontSize: 28, letterSpacing: 4, opacity: 0.7 }}>
           SUNSETX
         </div>
 
         <div
           style={{
             display: "flex",
-            fontSize: 96,
+            fontSize: 64,
+            fontWeight: 700,
+            marginTop: 20,
+          }}
+        >
+          {city}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            fontSize: 120,
             fontWeight: 800,
-            marginTop: 16,
+            marginTop: 20,
+            lineHeight: 1,
           }}
         >
-          82 🔥
+          {score} 🔥
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            fontSize: 28,
-            marginTop: 12,
-            opacity: 0.85,
-          }}
-        >
-          Tonight is worth it
+        <div style={{ display: "flex", fontSize: 28, marginTop: 24, opacity: 0.9 }}>
+          Peak: {peak}
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            fontSize: 24,
-            marginTop: 10,
-            opacity: 0.75,
-          }}
-        >
-          Peak: 6:38 PM – 6:48 PM
+        <div style={{ display: "flex", fontSize: 24, marginTop: 12, opacity: 0.75 }}>
+          Best nearby: {bestSpot}
         </div>
       </div>
     ),

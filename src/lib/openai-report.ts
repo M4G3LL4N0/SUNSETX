@@ -1,11 +1,9 @@
 import OpenAI from "openai"
 import { getCachedAiSummary, setCachedAiSummary } from "@/lib/ai-cache"
+import { buildFallbackNarrative } from "@/lib/fallback-report"
 
 const apiKey = process.env.OPENAI_API_KEY
-
-const client = apiKey
-  ? new OpenAI({ apiKey })
-  : null
+const client = apiKey ? new OpenAI({ apiKey }) : null
 
 type Spot = {
   name: string
@@ -64,6 +62,16 @@ export async function generateAiSunsetNarrative(input: {
   wind: number
   spots: Spot[]
 }) {
+  const fallback = buildFallbackNarrative({
+    cityLabel: input.cityLabel,
+    score: input.score,
+    sunsetLocalTime: input.sunsetLocalTime,
+    peakStart: input.peakStart,
+    peakEnd: input.peakEnd,
+    explanation: input.explanation,
+    topSpotName: input.spots[0]?.name,
+  })
+
   const cacheKey = buildCacheKey({
     cityLabel: input.cityLabel,
     score: input.score,
@@ -87,9 +95,8 @@ export async function generateAiSunsetNarrative(input: {
 
   if (!client) {
     return {
-      data: null,
+      data: fallback,
       status: "fallback" as const,
-      reason: "missing_api_key",
     }
   }
 
@@ -168,7 +175,10 @@ export async function generateAiSunsetNarrative(input: {
       },
     })
 
-    const parsed = JSON.parse(response.output_text)
+    const parsed = {
+      ...JSON.parse(response.output_text),
+      source: "openai",
+    }
 
     await setCachedAiSummary({
       cacheKey,
@@ -184,11 +194,9 @@ export async function generateAiSunsetNarrative(input: {
     }
   } catch (error) {
     console.error("OpenAI narrative fallback triggered:", error)
-
     return {
-      data: null,
+      data: fallback,
       status: "fallback" as const,
-      reason: "provider_unavailable",
     }
   }
 }
