@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import SunsetReportWidget from "@/components/SunsetReportWidget"
 import EnableNotifications from "@/components/EnableNotifications"
 import ShareLiveCard from "@/components/ShareLiveCard"
+import PreferencesPanel from "@/components/PreferencesPanel"
 import { generateSunsetReport } from "@/lib/report"
 import { getLeaveNowStatus } from "@/lib/leave-now"
 
@@ -54,13 +55,26 @@ function StatusPill({ children }: { children: React.ReactNode }) {
   )
 }
 
+function getUserKey() {
+  if (typeof window === "undefined") return "anonymous"
+  const existing = localStorage.getItem("sunsetx:user-key")
+  if (existing) return existing
+
+  const next = crypto.randomUUID()
+  localStorage.setItem("sunsetx:user-key", next)
+  return next
+}
+
 export default function LiveSunsetDashboard() {
   const [coords, setCoords] = useState(FALLBACK)
+  const [userKey, setUserKey] = useState("anonymous")
   const [status, setStatus] = useState("Using default location")
   const [data, setData] = useState<ApiResponse | null>(null)
   const [error, setError] = useState("")
 
   useEffect(() => {
+    setUserKey(getUserKey())
+
     const saved = localStorage.getItem("sunsetx:last-location")
     if (saved) {
       try {
@@ -104,9 +118,10 @@ export default function LiveSunsetDashboard() {
     const load = async () => {
       try {
         setError("")
-        const res = await fetch(`/api/live-score?lat=${coords.lat}&lon=${coords.lon}`, {
-          cache: "no-store",
-        })
+        const res = await fetch(
+          `/api/live-score?lat=${coords.lat}&lon=${coords.lon}&userKey=${encodeURIComponent(userKey)}`,
+          { cache: "no-store" }
+        )
 
         const json = await res.json()
 
@@ -124,14 +139,15 @@ export default function LiveSunsetDashboard() {
       }
     }
 
-    load()
-    const id = window.setInterval(load, 300000)
-
-    return () => {
-      active = false
-      window.clearInterval(id)
+    if (userKey !== "anonymous") {
+      load()
+      const id = window.setInterval(load, 300000)
+      return () => {
+        active = false
+        window.clearInterval(id)
+      }
     }
-  }, [coords.lat, coords.lon])
+  }, [coords.lat, coords.lon, userKey])
 
   const report = useMemo(() => (data ? generateSunsetReport(data) : null), [data])
 
@@ -155,12 +171,7 @@ export default function LiveSunsetDashboard() {
           SUNSETX
         </h1>
         <div className="mt-8 rounded-3xl border border-white/10 bg-black/30 p-6">
-          <div className="text-xl font-medium text-zinc-100">
-            {prettyError(error)}
-          </div>
-          <div className="mt-3 text-sm leading-6 text-zinc-400">
-            SUNSETX always falls back to a usable sunset system instead of exposing raw provider failures.
-          </div>
+          <div className="text-xl font-medium text-zinc-100">{prettyError(error)}</div>
         </div>
       </section>
     )
@@ -203,7 +214,7 @@ export default function LiveSunsetDashboard() {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+      <div className="mt-6 grid gap-4 lg:grid-cols-4">
         <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
           <div className="text-sm font-medium text-zinc-100">Leave-now engine</div>
           <div className="mt-2 text-sm text-zinc-400">
@@ -238,6 +249,8 @@ export default function LiveSunsetDashboard() {
             />
           </div>
         </div>
+
+        <PreferencesPanel userKey={userKey} />
       </div>
 
       <SunsetReportWidget report={report} />

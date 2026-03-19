@@ -13,6 +13,7 @@ import { calculateSkyScore } from "@/lib/scoring"
 import { locations } from "@/lib/locations"
 import { getClosestRankedSpots } from "@/lib/geo"
 import { generateAiSunsetNarrative } from "@/lib/openai-report"
+import { getUserPreferences, personalizeSpotScore } from "@/lib/preferences"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -43,37 +44,21 @@ function buildExplanation(input: {
 }) {
   const parts: string[] = []
 
-  if (input.clouds >= 20 && input.clouds <= 65) {
-    parts.push("balanced cloud layer for color reflection")
-  } else if (input.clouds < 20) {
-    parts.push("clean sky but lighter cloud texture")
-  } else {
-    parts.push("heavier cloud cover risk")
-  }
+  if (input.clouds >= 20 && input.clouds <= 65) parts.push("balanced cloud layer for color reflection")
+  else if (input.clouds < 20) parts.push("clean sky but lighter cloud texture")
+  else parts.push("heavier cloud cover risk")
 
-  if (input.visibilityMiles >= 8) {
-    parts.push("good visibility")
-  } else if (input.visibilityMiles >= 5) {
-    parts.push("moderate clarity")
-  } else {
-    parts.push("lower clarity")
-  }
+  if (input.visibilityMiles >= 8) parts.push("good visibility")
+  else if (input.visibilityMiles >= 5) parts.push("moderate clarity")
+  else parts.push("lower clarity")
 
-  if (input.humidity >= 40 && input.humidity <= 70) {
-    parts.push("balanced atmospheric softness")
-  } else if (input.humidity > 70) {
-    parts.push("higher humidity and possible haze")
-  } else {
-    parts.push("drier atmosphere")
-  }
+  if (input.humidity >= 40 && input.humidity <= 70) parts.push("balanced atmospheric softness")
+  else if (input.humidity > 70) parts.push("higher humidity and possible haze")
+  else parts.push("drier atmosphere")
 
-  if (input.afterglowScore >= 75) {
-    parts.push("high afterglow potential")
-  } else if (input.afterglowScore >= 55) {
-    parts.push("good afterglow potential")
-  } else {
-    parts.push("limited afterglow upside")
-  }
+  if (input.afterglowScore >= 75) parts.push("high afterglow potential")
+  else if (input.afterglowScore >= 55) parts.push("good afterglow potential")
+  else parts.push("limited afterglow upside")
 
   return parts.join(" · ")
 }
@@ -83,19 +68,18 @@ export async function GET(req: Request) {
     const url = new URL(req.url)
     const lat = Number(url.searchParams.get("lat") ?? "37.5985")
     const lon = Number(url.searchParams.get("lon") ?? "-122.3872")
+    const userKey = url.searchParams.get("userKey") ?? "anonymous"
 
     const current = await getCurrentWeather(lat, lon)
     const forecast = await getForecastWeather(lat, lon)
+    const prefs = await getUserPreferences(userKey)
 
     const timezoneOffset = current.timezone ?? forecast.city?.timezone ?? -25200
     const sunsetUnix = current.sys?.sunset ?? forecast.city?.sunset
     const currentUnix = current.dt
 
     if (!sunsetUnix || !currentUnix) {
-      return Response.json(
-        { error: "Missing sunset data from weather provider" },
-        { status: 500 }
-      )
+      return Response.json({ error: "Missing sunset data from weather provider" }, { status: 500 })
     }
 
     const sunsetDate = unixSecondsToDate(sunsetUnix)
@@ -124,7 +108,13 @@ export async function GET(req: Request) {
       afterglowScore,
     })
 
-    const closestSpots = getClosestRankedSpots(lat, lon, locations, skyScore)
+    const baseSpots = getClosestRankedSpots(lat, lon, locations, skyScore)
+    const closestSpots = baseSpots
+      .map((spot) => ({
+        ...spot,
+        score: personalizeSpotScore(spot, prefs),
+      }))
+      .sort((a, b) => b.score - a.score)
 
     const cityLabel = inferCityLabel(lat, lon)
     const regionLabel = inferRegionLabel()
@@ -169,6 +159,7 @@ export async function GET(req: Request) {
         cityLabel,
         regionLabel,
         timezoneOffset,
+        userPreferences: prefs,
         currentLocalTime: formatWithOffset(currentDate, timezoneOffset),
         sunsetLocalTime: formatWithOffset(sunsetDate, timezoneOffset),
         peakWindow: {
@@ -204,13 +195,9 @@ export async function GET(req: Request) {
       }
     )
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown live-score error"
-
     return Response.json(
       {
-        error: message,
-        hint: "Check OPENWEATHER_API_KEY and route dependencies.",
+        error: error instanceof Error ? error.message : "Unknown live-score error",
       },
       { status: 500 }
     )
