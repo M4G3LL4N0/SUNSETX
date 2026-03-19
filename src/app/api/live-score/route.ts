@@ -68,11 +68,9 @@ function inferRegionLabel(lat: number, lon: number) {
 }
 
 function buildExplanation(input: {
-  clouds: number
-  humidity: number
+  clouds: number  humidity: number
   visibilityMiles: number
-  afterglowScore: number
-}) {
+  afterglowScore: number}) {
   const parts: string[] = []
 
   if (input.clouds >= 20 && input.clouds <= 65) {
@@ -208,8 +206,7 @@ export async function GET(req: Request) {
     // Get categorized spots
     const spotGroups = getClosestRankedSpots(lat, lon, locations, skyScore)
     
-    // Personalize the scores for all spot groups
-    const personalizeSpot = (spot: any) => spot ? {
+    // Personalize the scores for all spot groups    const personalizeSpot = (spot: any) => spot ? {
       ...spot,
       score: personalizeSpotScore(spot, prefs),
     } : null

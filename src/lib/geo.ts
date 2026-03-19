@@ -85,8 +85,7 @@ export function getClosestRankedSpots(
 
   // Group C: Premium best-in-region spot (~1 hour or highest quality)
   const premiumSpot = scoredSpots
-    .filter(spot => 
-      !closeSpots.some(cs => cs.id === spot.id) &&
+    .filter(spot =>       !closeSpots.some(cs => cs.id === spot.id) &&
       !midRangeSpot.some(ms => ms.id === spot.id)
     )
     .slice(0, 1)

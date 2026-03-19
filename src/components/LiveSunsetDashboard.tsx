@@ -43,8 +43,7 @@ type ApiResponse = {
     humidity: number
     visibilityMiles: number
     windMph: number
-    sunElevation: number
-    summary: string
+    sunElevation: number    summary: string
   }
   closeSpots: NearbySpot[]
   midRangeSpot: NearbySpot | null
@@ -380,6 +379,10 @@ export default function LiveSunsetDashboard() {
     )
   }
 
+  const quickOptions = data.closeSpots.slice(0, 3)
+  const premiumOption = data.midRangeSpot || data.premiumSpot
+  const regionalDestination = data.premiumSpot || (data.closeSpots.find(s => s.driveMinutes > 60) || null)
+
   return (
     <section className="overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl md:p-6">
       {/* DEBUG INFO */}
@@ -399,8 +402,7 @@ export default function LiveSunsetDashboard() {
           </div>
 
           <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-6xl">
-            SUNSETX
-          </h1>
+            SUNSETX          </h1>
 
           <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-300 md:text-base">
             Every visitor sees a location-aware sunset report with nearby spots,
@@ -476,6 +478,52 @@ export default function LiveSunsetDashboard() {
               bestSpot={topSpot?.name}
             />
           </div>
+        </div>
+      </div>
+
+      {/* RECOMMENDATION TIERS */}
+      <div className="mt-5 grid gap-2 md:grid-cols-3">
+        <div className="text-sm font-medium text-zinc-100">Quick Options (5‑15 min)</div>
+        {quickOptions.map((spot, index) => (
+          <div key={spot.id} className="rounded-[24px] border border-white/[0.08] bg-white/[0.04] p-3 backdrop-blur-xl">
+            <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">#{index + 1}</div>
+            <div className="text-sm font-medium">{spot.name}</div>
+            <div className="text-xs text-zinc-300">{spot.address}</div>
+            <div className="mt-1 text-[11px] text-zinc-400">{spot.distanceMiles} mi • {spot.driveMinutes} min</div>
+            <div className="text-[11px] font-medium">{spot.score}/100</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 grid gap-2 md:grid-cols-2">
+        <div className="text-sm font-medium text-zinc-100">Premium Option (~30 min)</div>
+        <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.04] p-3 backdrop-blur-xl">
+          {premiumOption ? (
+            <div>
+              <div className="text-sm font-medium">{premiumOption.name}</div>
+              <div className="text-xs text-zinc-300">{premiumOption.address}</div>
+              <div className="mt-1 text-[11px] text-zinc-400">{premiumOption.distanceMiles} mi • {premiumOption.driveMinutes} min</div>
+              <div className="text-[11px] font-medium">{premiumOption.score}/100</div>
+            </div>
+          ) : (
+            <div className="text-zinc-300">None</div>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-2 md:grid-cols-2">
+        <div className="text-sm font-medium text-zinc-100">Regional Destination (~1 hr)</div>
+        <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.04] p-3 backdrop-blur-xl">
+          {regionalDestination ? (
+            <div>
+              <div className="text-sm font-medium">{regionalDestination.name}</div>
+              <div className="text-xs text-zinc-300">{regionalDestination.address}</div>
+              <div className="mt-1 text-[11px] text-zinc-400">{regionalDestination.distanceMiles} mi • {regionalDestination.driveMinutes} min</div>
+              <div className="text-[11px] font-medium">{regionalDestination.score}/100</div>
+            </div>
+          ) : (
+            <div className="text-zinc-300">None</div>
+          )}
         </div>
       </div>
 
