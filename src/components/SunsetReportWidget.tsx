@@ -254,18 +254,19 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
         </div>
       </div>
 
-      <Card title="What to avoid">
+      <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-orange-400/5 via-amber-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
+        <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-3">What to avoid</div>
         <div className="grid gap-2">
           {report.avoid.map((item) => (
             <div
               key={item}
-              className="rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-xs leading-5 text-zinc-300"
+              className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 text-sm leading-5 text-zinc-300"
             >
               {item}
             </div>
           ))}
         </div>
-      </Card>
+      </div>
 
       <div className="space-y-3">
         <div className="text-[11px] uppercase tracking-[0.24em] text-zinc-500">
