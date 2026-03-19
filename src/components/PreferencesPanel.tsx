@@ -50,62 +50,87 @@ export default function PreferencesPanel({
     setStatus(res.ok ? "Saved." : "Failed to save.")
   }
 
+  // Custom toggle switch component
+  const Toggle = ({
+    checked,
+    onChange,
+    label,
+  }: {
+    checked: boolean
+    onChange: (c: boolean) => void
+    label: string
+  }) => (
+    <label className="flex items-center justify-between cursor-pointer py-2">
+      <span className="text-base text-zinc-200">{label}</span>
+      <div className="relative">
+        <input
+          type="checkbox"
+          className="sr-only"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+        />
+        <div
+          className={`w-12 h-7 rounded-full transition-all duration-300 ${
+            checked ? "bg-gradient-to-r from-pink-500 to-orange-500" : "bg-white/10"
+          }`}
+        ></div>
+        <div
+          className={`absolute left-1 top-1 w-5 h-5 rounded-full bg-white shadow-lg transition-transform duration-300 ${
+            checked ? "translate-x-5" : ""
+          }`}
+        ></div>
+      </div>
+    </label>
+  )
+
   return (
-    <div className="rounded-[24px] border border-white/10 bg-white/[0.06] p-4 backdrop-blur-xl">
-      <div className="text-sm font-medium text-zinc-100">Preferences</div>
+    <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-6 md:p-8 backdrop-blur-xl">
+      <div className="text-lg font-semibold text-zinc-100 mb-6">Preferences</div>
 
-      <div className="mt-4 space-y-3 text-sm text-zinc-300">
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={prefs.prefersWoodsy}
-            onChange={(e) => setPrefs((p) => ({ ...p, prefersWoodsy: e.target.checked }))}
-          />
-          Prefer woodsy spots
-        </label>
+      <div className="space-y-6">
+        <Toggle
+          label="Prefer woodsy spots"
+          checked={prefs.prefersWoodsy}
+          onChange={(c) => setPrefs((p) => ({ ...p, prefersWoodsy: c }))}
+        />
+        <Toggle
+          label="Avoid water smell"
+          checked={prefs.avoidWaterSmell}
+          onChange={(c) => setPrefs((p) => ({ ...p, avoidWaterSmell: c }))}
+        />
+        <Toggle
+          label="Prefer quiet vibe"
+          checked={prefs.quietVibe}
+          onChange={(c) => setPrefs((p) => ({ ...p, quietVibe: c }))}
+        />
 
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={prefs.avoidWaterSmell}
-            onChange={(e) => setPrefs((p) => ({ ...p, avoidWaterSmell: e.target.checked }))}
-          />
-          Avoid water smell
-        </label>
-
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={prefs.quietVibe}
-            onChange={(e) => setPrefs((p) => ({ ...p, quietVibe: e.target.checked }))}
-          />
-          Prefer quiet vibe
-        </label>
-
-        <label className="block">
-          <div className="mb-2 text-xs text-zinc-400">
-            Max drive minutes: {prefs.maxDriveMinutes}
+        <div>
+          <div className="flex justify-between text-sm text-zinc-300 mb-3">
+            <span>Max drive minutes</span>
+            <span className="font-medium text-white">{prefs.maxDriveMinutes}</span>
           </div>
           <input
             type="range"
             min="5"
             max="30"
             value={prefs.maxDriveMinutes}
-            onChange={(e) => setPrefs((p) => ({ ...p, maxDriveMinutes: Number(e.target.value) }))}
-            className="w-full"
+            onChange={(e) =>
+              setPrefs((p) => ({ ...p, maxDriveMinutes: Number(e.target.value) }))
+            }
+            className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-white/50"
           />
-        </label>
+        </div>
       </div>
 
       <button
         type="button"
         onClick={save}
-        className="mt-4 rounded-full border border-white/10 bg-white px-4 py-2 text-sm font-medium text-black"
+        className="mt-8 w-full rounded-full border border-white/10 bg-gradient-to-r from-pink-500 to-orange-500 px-4 py-3 text-sm font-medium text-white shadow-lg hover:from-pink-600 hover:to-orange-600 transition-all duration-300"
       >
         Save preferences
       </button>
 
-      {status ? <div className="mt-3 text-xs text-zinc-400">{status}</div> : null}
+      {status ? <div className="mt-4 text-xs text-zinc-400 text-center">{status}</div> : null}
     </div>
   )
 }

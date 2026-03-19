@@ -16,12 +16,21 @@ export default function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_35%),linear-gradient(180deg,#050505_0%,#0a0a0f_45%,#060606_100%)]" />
       </div>
 
-      <div className="mx-auto max-w-md px-4 py-4 md:max-w-7xl md:px-6 md:py-8">
-        <div className="mb-4 inline-flex rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.28em] text-zinc-300 backdrop-blur-xl">
-          SUNSETX · Live Sunset Intelligence
+      <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 md:py-16">
+        <div className="mb-12 text-center">
+          <div className="inline-flex rounded-full border border-white/10 bg-white/10 px-4 py-2 text-[10px] font-medium uppercase tracking-[0.28em] text-zinc-300 backdrop-blur-xl mb-6">
+            SUNSETX · Live Sunset Intelligence
+          </div>
+          <h1 className="text-4xl md:text-6xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-300 via-pink-200 to-orange-200 mb-6">
+            Never miss a perfect sunset
+          </h1>
+          <p className="max-w-2xl mx-auto text-lg leading-relaxed text-zinc-300">
+            Location-aware sunset intelligence with nearby spots, timing precision, and premium narrative guidance.
+            Know exactly when and where to be for the best colors.
+          </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-20">
           <LiveSunsetDashboard />
           <EducationRotator />
           <GlobalSunsetBoard />

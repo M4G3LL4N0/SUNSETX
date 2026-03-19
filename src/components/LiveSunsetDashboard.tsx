@@ -162,34 +162,6 @@ function buildEmergencyData(): ApiResponse {
   }
 }
 
-function Pill({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-medium text-zinc-200 backdrop-blur-xl">
-      {children}
-    </span>
-  )
-}
-
-function MiniCard({
-  title,
-  value,
-  subtitle,
-  className = "",
-}: {
-  title: string
-  value: string
-  subtitle?: string
-  className?: string
-}) {
-  return (
-    <div className={`rounded-[24px] border border-white/10 p-4 backdrop-blur-2xl ${className}`}>
-      <div className="text-[11px] uppercase tracking-[0.22em] text-zinc-400">{title}</div>
-      <div className="mt-2 text-2xl font-semibold tracking-tight text-white">{value}</div>
-      {subtitle ? <div className="mt-1 text-xs text-zinc-300">{subtitle}</div> : null}
-    </div>
-  )
-}
-
 function getUserKey() {
   if (typeof window === "undefined") return "anonymous"
   const existing = localStorage.getItem("sunsetx:user-key")
@@ -206,6 +178,7 @@ export default function LiveSunsetDashboard() {
   const [status, setStatus] = useState("Using default location")
   const [data, setData] = useState<ApiResponse | null>(null)
   const [fallbackMode, setFallbackMode] = useState(false)
+  const [showPreferences, setShowPreferences] = useState(false)
 
   useEffect(() => {
     setUserKey(getUserKey())
@@ -305,98 +278,116 @@ export default function LiveSunsetDashboard() {
     )
   }
 
+  const topSpot = data.nearbyRankedLocations?.[0]
+
   return (
-    <section className="overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl md:p-6">
-      <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
-        <div>
-          <div className="text-[11px] uppercase tracking-[0.28em] text-zinc-400">
-            Personalized live sunset report
-          </div>
+    <section className="overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.06] p-8 md:p-12 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl">
+      {/* Header */}
+      <div className="text-center mb-12">
+        <div className="text-[11px] uppercase tracking-[0.28em] text-zinc-400 mb-3">
+          Personalized live sunset report
+        </div>
+        <h1 className="text-5xl md:text-7xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-300 via-pink-200 to-orange-200 mb-4">
+          SUNSETX
+        </h1>
+        <p className="max-w-2xl mx-auto text-lg leading-relaxed text-zinc-300">
+          Every visitor sees a location-aware sunset report with nearby spots,
+          timing intelligence, premium narrative guidance, and a clear go / no-go decision.
+        </p>
+      </div>
 
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-6xl">
-            SUNSETX
-          </h1>
-
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-300 md:text-base">
-            Every visitor sees a location-aware sunset report with nearby spots,
-            timing intelligence, premium narrative guidance, and a clear go / no-go decision.
-          </p>
-
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Pill>{status}</Pill>
-            <Pill>Mode: {fallbackMode ? "Fallback" : "Live"}</Pill>
-            <Pill>Updated {new Date(data.updatedAt).toLocaleTimeString()}</Pill>
-          </div>
+      {/* Hero Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        {/* Score Card */}
+        <div className="rounded-[24px] border border-white/10 bg-gradient-to-br from-fuchsia-900/20 via-pink-900/10 to-transparent p-8 backdrop-blur-xl">
+          <div className="text-sm font-medium text-zinc-100 mb-2">Tonight's Score</div>
+          <div className="text-7xl font-bold text-white">{data.skyScore}</div>
+          <div className="text-sm text-zinc-400 mt-1">out of 100</div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <MiniCard
-            title="Tonight"
-            value={`${data.skyScore}`}
-            subtitle="Sunset score"
-            className="bg-[linear-gradient(135deg,rgba(244,114,182,0.22),rgba(251,146,60,0.16),rgba(56,189,248,0.14))]"
-          />
-          <MiniCard
-            title="Peak"
-            value={`${data.peakWindow.start}`}
-            subtitle={`${data.peakWindow.start} – ${data.peakWindow.end}`}
-            className="bg-[linear-gradient(135deg,rgba(59,130,246,0.18),rgba(168,85,247,0.16))]"
-          />
-          <MiniCard
-            title="Sunset"
-            value={data.sunsetLocalTime}
-            subtitle="Official sunset"
-            className="bg-[linear-gradient(135deg,rgba(251,146,60,0.18),rgba(244,114,182,0.14))]"
-          />
-          <MiniCard
-            title="Top Spot"
-            value={data.nearbyRankedLocations?.[0]?.name ?? "Nearby spot"}
-            subtitle={`~${data.nearbyRankedLocations?.[0]?.driveMinutes ?? 0} min away`}
-            className="bg-[linear-gradient(135deg,rgba(34,197,94,0.16),rgba(16,185,129,0.10))]"
-          />
+        {/* Timing Card */}
+        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl">
+          <div className="text-sm font-medium text-zinc-100 mb-4">Timing</div>
+          <div className="space-y-4">
+            <div>
+              <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Peak window</div>
+              <div className="text-3xl font-semibold text-white">
+                {data.peakWindow.start} – {data.peakWindow.end}
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Sunset</div>
+              <div className="text-3xl font-semibold text-white">{data.sunsetLocalTime}</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="mt-5 grid gap-3 lg:grid-cols-4">
-        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
-          <div className="text-sm font-medium text-zinc-100">Leave-now engine</div>
-          <div className="mt-2 text-sm text-zinc-300">
+      {/* Top Spot & Leave Now */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        {/* Top Spot Card */}
+        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl">
+          <div className="text-sm font-medium text-zinc-100 mb-4">Top Spot</div>
+          <div>
+            <div className="text-2xl font-semibold text-white mb-2">{topSpot?.name ?? "Nearby spot"}</div>
+            <div className="text-zinc-300 mb-4">{topSpot?.address}</div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-zinc-200">
+              <span>~{topSpot?.driveMinutes ?? 0} min drive</span>
+              <span>•</span>
+              <span>{topSpot?.distanceMiles ?? 0} miles</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Leave Now Card */}
+        <div className="rounded-[24px] border border-white/10 bg-gradient-to-br from-orange-900/20 via-amber-900/10 to-transparent p-8 backdrop-blur-xl">
+          <div className="text-sm font-medium text-zinc-100 mb-4">Leave-Now Engine</div>
+          <div className="text-xl text-zinc-200 mb-4">
             {leaveNow?.copy ?? "Leave timing unavailable."}
           </div>
           {leaveNow?.leaveAt ? (
-            <div className="mt-3 inline-flex rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-zinc-200">
+            <div className="inline-flex rounded-full border border-white/10 bg-white/10 px-6 py-3 text-base font-medium text-zinc-200">
               Ideal leave time: {leaveNow.leaveAt}
             </div>
           ) : null}
         </div>
+      </div>
 
+      {/* Actions Row */}
+      <div className="flex flex-wrap gap-4 justify-center mb-12">
         <EnableNotifications
           lat={coords.lat}
           lon={coords.lon}
           cityLabel={data.cityLabel}
           timezoneOffset={data.timezoneOffset}
         />
-
-        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
-          <div className="text-sm font-medium text-zinc-100">Share</div>
-          <div className="mt-2 text-sm text-zinc-300">
-            Create a live sunset share card from your current report.
-          </div>
-          <div className="mt-4">
-            <ShareLiveCard
-              cityLabel={data.cityLabel}
-              score={data.skyScore}
-              peakStart={data.peakWindow.start}
-              peakEnd={data.peakWindow.end}
-              bestSpot={data.nearbyRankedLocations?.[0]?.name}
-            />
-          </div>
-        </div>
-
-        <PreferencesPanel userKey={userKey} />
+        <ShareLiveCard
+          cityLabel={data.cityLabel}
+          score={data.skyScore}
+          peakStart={data.peakWindow.start}
+          peakEnd={data.peakWindow.end}
+          bestSpot={topSpot?.name}
+        />
+        <button
+          type="button"
+          onClick={() => setShowPreferences(!showPreferences)}
+          className="rounded-full border border-white/10 bg-white/5 px-6 py-2.5 text-sm font-medium text-zinc-200 hover:bg-white/10 transition-colors"
+        >
+          {showPreferences ? "Hide Preferences" : "Preferences"}
+        </button>
       </div>
 
-      <SunsetReportWidget report={report} />
+      {/* Preferences Panel (collapsible) */}
+      {showPreferences && (
+        <div className="mb-12">
+          <PreferencesPanel userKey={userKey} />
+        </div>
+      )}
+
+      {/* Detailed Report */}
+      <div className="mt-16">
+        <SunsetReportWidget report={report} />
+      </div>
     </section>
   )
 }

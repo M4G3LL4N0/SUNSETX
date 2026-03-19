@@ -15,7 +15,7 @@ const Map = dynamic(() => import("@/components/Map"), {
 
 export default function MapSection({ locations }: { locations: Location[] }) {
   return (
-    <div className="h-[300px] md:h-[400px]">
+    <div className="rounded-[24px] border border-white/10 overflow-hidden backdrop-blur-sm h-[300px] md:h-[400px]">
       <Map locations={locations} />
     </div>
   )
