@@ -298,14 +298,14 @@ export default function LiveSunsetDashboard() {
   return (
     <section className="overflow-hidden rounded-[28px] border border-white/[0.08] bg-gradient-to-b from-black/30 via-black/20 to-black/10 p-5 md:p-6 shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-xl">
       {/* Header */}
-      <div className="text-center mb-6">
-        <div className="inline-flex items-center rounded-full bg-gradient-to-r from-violet-400/10 to-fuchsia-400/10 px-3 py-1 text-[11px] font-medium tracking-wide text-violet-100 ring-1 ring-violet-400/20 backdrop-blur-xl mb-3">
+      <div className="text-center mb-5">
+        <div className="inline-flex items-center rounded-full bg-gradient-to-r from-violet-400/10 via-fuchsia-400/10 to-amber-400/10 px-3 py-1 text-[11px] font-medium tracking-wide text-violet-100 ring-1 ring-violet-400/20 backdrop-blur-xl mb-2.5">
           Live sunset intelligence
         </div>
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-100 via-fuchsia-100 to-amber-100 mb-2">
+        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-violet-100 via-fuchsia-100 to-amber-100 mb-1.5">
           SUNSETX
         </h1>
-        <p className="max-w-lg mx-auto text-sm leading-relaxed text-zinc-300/80">
+        <p className="max-w-lg mx-auto text-sm leading-relaxed text-zinc-400">
           Premium sunset intelligence with real-time scoring and location-aware guidance
         </p>
       </div>
@@ -313,18 +313,18 @@ export default function LiveSunsetDashboard() {
       {/* Widget Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
         {/* Main Score Widget */}
-        <div className="col-span-2 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/10 via-fuchsia-400/5 to-transparent p-3.5 shadow-lg backdrop-blur-xl">
+        <div className="col-span-2 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/10 via-fuchsia-400/5 to-amber-400/5 p-4 shadow-lg backdrop-blur-xl">
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-baseline gap-1">
-                <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-100 to-fuchsia-100">{data.skyScore}</div>
+              <div className="flex items-baseline gap-1.5">
+                <div className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-100 via-fuchsia-100 to-amber-100">{data.skyScore}</div>
                 <div className="text-sm text-zinc-400 font-medium">/ 100</div>
               </div>
-              <div className="mt-1 text-sm font-medium text-zinc-300">Tonight's Score</div>
+              <div className="mt-1.5 text-sm font-medium text-zinc-300">Tonight's Score</div>
             </div>
             <div className="text-right">
               <div className="text-sm font-medium text-zinc-300">{data.cityLabel}</div>
-              <div className="mt-0.5 text-xs text-zinc-400">{status}</div>
+              <div className="mt-1 text-xs text-zinc-400">{status}</div>
             </div>
           </div>
         </div>
