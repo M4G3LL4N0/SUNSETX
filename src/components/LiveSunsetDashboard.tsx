@@ -110,7 +110,9 @@ export default function LiveSunsetDashboard() {
         const json = (await res.json()) as ApiResponse
         if (active) setData(json)
       } catch (e) {
-        if (active) setError(e instanceof Error ? e.message : "Failed to load")
+        if (active) {
+          setError(e instanceof Error ? e.message : "Failed to load")
+        }
       }
     }
 
