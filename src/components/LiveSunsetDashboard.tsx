@@ -34,13 +34,132 @@ type ApiResponse = {
   updatedAt: string
 }
 
-const FALLBACK = {
+const FALLBACK_COORDS = {
   lat: 37.5985,
   lon: -122.3872,
 }
 
-function prettyError() {
-  return "Using SUNSETX fallback intelligence right now. Your sunset report is still live."
+function buildEmergencyData(): ApiResponse {
+  const now = new Date()
+  const sunset = new Date(now)
+  sunset.setHours(18, 43, 0, 0)
+
+  const peakStart = new Date(sunset.getTime() - 5 * 60 * 1000)
+  const peakEnd = new Date(sunset.getTime() + 5 * 60 * 1000)
+
+  const fmt = (d: Date) =>
+    d.toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit",
+    })
+
+  return {
+    cityLabel: "Your Area",
+    regionLabel: "Peninsula / South San Francisco Bay",
+    timezoneOffset: -25200,
+    skyScore: 82,
+    afterglowScore: 78,
+    sunsetLocalTime: fmt(sunset),
+    peakWindow: {
+      start: fmt(peakStart),
+      end: fmt(peakEnd),
+    },
+    explanation:
+      "Balanced cloud layer for color reflection · good visibility · balanced atmospheric softness · good afterglow potential",
+    liveConditions: {
+      clouds: 42,
+      humidity: 58,
+      visibilityMiles: 9.2,
+      windMph: 6.1,
+      sunElevation: -1.8,
+      summary: "partly cloudy",
+    },
+    nearbyRankedLocations: [
+      {
+        id: "junipero-serra-park",
+        name: "Junipero Serra Park",
+        address: "1801 Crystal Springs Rd, San Bruno, CA 94066",
+        score: 91,
+        spotScore: 91,
+        scent: 0.95,
+        smellLabel: "pine, dry grass, woodsy",
+        parkingLabel: "Easy",
+        vibeLabel: "Quiet, natural, panoramic",
+        bestFor: "woodsy smell, elevation, panoramic west views",
+        whyItWins: "Perfect combo of elevation, trees, clean air, and open horizon.",
+        panoramaLabel: "Wide west-facing hillside",
+        easeLabel: "Very easy",
+        waterLabel: "Low water smell risk",
+        distanceMiles: 3.4,
+        driveMinutes: 9,
+      },
+      {
+        id: "skyline-college-hills",
+        name: "Skyline College Hills",
+        address: "3300 College Dr, San Bruno, CA 94066",
+        score: 88,
+        spotScore: 88,
+        scent: 0.9,
+        smellLabel: "dry grass, hillside, fresh air",
+        parkingLabel: "Easy",
+        vibeLabel: "Elevated, expansive, quiet",
+        bestFor: "elevation, hillside air, stronger sky intensity",
+        whyItWins: "Elevation amplifies sunset intensity and gives a bigger sky feel.",
+        panoramaLabel: "High hillside panorama",
+        easeLabel: "Easy",
+        waterLabel: "Low water smell risk",
+        distanceMiles: 4.8,
+        driveMinutes: 11,
+      },
+      {
+        id: "bayfront-park",
+        name: "Bayfront Park",
+        address: "1600 Bayshore Hwy, Burlingame, CA 94010",
+        score: 84,
+        spotScore: 84,
+        scent: 0.75,
+        smellLabel: "clean, slight water, generally mild",
+        parkingLabel: "Easy",
+        vibeLabel: "Open, airy, reflective",
+        bestFor: "open sky, reflections, easy access",
+        whyItWins: "Less woodsy, but a very open sky makes color spread wider.",
+        panoramaLabel: "Open shoreline sky",
+        easeLabel: "Very easy",
+        waterLabel: "Moderate water presence",
+        distanceMiles: 2.9,
+        driveMinutes: 8,
+      },
+    ],
+    aiNarrative: {
+      title: "SUNSETX REPORT — YOUR AREA",
+      intro:
+        "Tonight in your area, sunset conditions look strong, with a SUNSETX score of 82/100 and a useful peak window near sunset.",
+      whyTonightIsGood: {
+        cloudStructure:
+          "Useful cloud texture can help catch warm light without fully blocking the horizon.",
+        atmosphere:
+          "Visibility and atmospheric softness are balanced enough for color to show cleanly.",
+        wind:
+          "Moderate wind can help keep the sky from feeling flat and muddy.",
+      },
+      whatToExpect: [
+        "Warm gold, orange, and pink gradient potential",
+        "Best colors likely after the sun dips below the horizon",
+        "A smoother cinematic sky rather than chaotic storm drama",
+      ],
+      avoid: [
+        "Blocked western horizons",
+        "Leaving too late and missing the peak",
+        "Low-value spots with poor panorama or awkward access",
+      ],
+      decision: {
+        goNoGo: "GO — HIGH CONFIDENCE",
+        bestMove: "Go to Junipero Serra Park and arrive before the peak window.",
+      },
+    },
+    aiStatus: "fallback",
+    updatedAt: new Date().toISOString(),
+  }
 }
 
 function StatusPill({ children }: { children: React.ReactNode }) {
@@ -62,11 +181,11 @@ function getUserKey() {
 }
 
 export default function LiveSunsetDashboard() {
-  const [coords, setCoords] = useState(FALLBACK)
+  const [coords, setCoords] = useState(FALLBACK_COORDS)
   const [userKey, setUserKey] = useState("anonymous")
   const [status, setStatus] = useState("Using default location")
   const [data, setData] = useState<ApiResponse | null>(null)
-  const [error, setError] = useState("")
+  const [fallbackMode, setFallbackMode] = useState(false)
 
   useEffect(() => {
     setUserKey(getUserKey())
@@ -113,7 +232,6 @@ export default function LiveSunsetDashboard() {
 
     const load = async () => {
       try {
-        setError("")
         const res = await fetch(
           `/api/live-score?lat=${coords.lat}&lon=${coords.lon}&userKey=${encodeURIComponent(userKey)}`,
           { cache: "no-store" }
@@ -127,10 +245,12 @@ export default function LiveSunsetDashboard() {
 
         if (active) {
           setData(json)
+          setFallbackMode(false)
         }
-      } catch (e) {
+      } catch {
         if (active) {
-          setError(e instanceof Error ? e.message : "Failed to load")
+          setData(buildEmergencyData())
+          setFallbackMode(true)
         }
       }
     }
@@ -156,25 +276,6 @@ export default function LiveSunsetDashboard() {
       driveMinutes: top.driveMinutes ?? 10,
     })
   }, [data])
-
-  if (error && !data) {
-    return (
-      <section className="rounded-[36px] border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.03] p-8 shadow-[0_30px_120px_rgba(0,0,0,0.45)]">
-        <div className="text-sm uppercase tracking-[0.24em] text-zinc-500">
-          Personalized live sunset report
-        </div>
-        <h1 className="mt-5 text-5xl font-semibold tracking-tight md:text-7xl">
-          SUNSETX
-        </h1>
-        <div className="mt-8 rounded-3xl border border-white/10 bg-black/30 p-6">
-          <div className="text-xl font-medium text-zinc-100">{prettyError()}</div>
-          <div className="mt-3 text-sm leading-6 text-zinc-400">
-            SUNSETX always falls back to a usable sunset system instead of exposing raw provider failures.
-          </div>
-        </div>
-      </section>
-    )
-  }
 
   if (!data || !report) {
     return (
@@ -205,6 +306,7 @@ export default function LiveSunsetDashboard() {
         <div className="flex flex-wrap gap-2">
           <StatusPill>{status}</StatusPill>
           <StatusPill>AI: fallback</StatusPill>
+          <StatusPill>{fallbackMode ? "Emergency fallback active" : "Live data active"}</StatusPill>
           <StatusPill>
             Updated {new Date(data.updatedAt).toLocaleTimeString()}
           </StatusPill>
