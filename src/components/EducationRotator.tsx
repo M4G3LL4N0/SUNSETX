@@ -97,50 +97,52 @@ export default function EducationRotator() {
   }
 
   return (
-    <section className="mt-8 rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-2xl">
-      <div className="flex items-center justify-between gap-4">
+    <section className="mt-6 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-4 shadow-lg backdrop-blur-xl">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <div className="text-xs uppercase tracking-[0.24em] text-zinc-500">
-            Sunset intelligence
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500">
+            Learn while you watch
           </div>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-            Learn the sky while it rotates
+          <h2 className="mt-1.5 text-lg font-medium text-white">
+            Sunset intelligence
           </h2>
         </div>
 
         <button
           type="button"
           onClick={() => setPaused((value) => !value)}
-          className="rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs text-zinc-400"
+          className="rounded-full border border-white/[0.08] bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-zinc-300"
         >
-          {paused ? "Resume" : `Next in ${secondsRemaining}s`}
+          {paused ? "Resume" : `${secondsRemaining}s`}
         </button>
       </div>
 
-      <div className="mt-6 rounded-3xl border border-white/10 bg-black/30 p-6">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-zinc-300">
+      <div className="mt-4 rounded-xl border border-white/[0.08] bg-gradient-to-br from-white/[0.03] to-transparent p-4 shadow-lg backdrop-blur-xl">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-[11px] font-medium text-zinc-300">
             {current.category}
           </span>
-          <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-zinc-400">
+          <span className="rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-[11px] font-medium text-zinc-400">
             {current.readTime}
           </span>
         </div>
 
-        <h3 className="mt-4 text-xl font-semibold">{current.title}</h3>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-300">
+        <h3 className="mt-3 text-lg font-medium text-white">{current.title}</h3>
+        <p className="mt-2 text-sm leading-6 text-zinc-400">
           {current.body}
         </p>
       </div>
 
-      <div className="mt-5 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap gap-1.5">
         {FACTS.map((fact, factIndex) => (
           <button
             key={fact.title}
             type="button"
             onClick={() => goTo(factIndex)}
-            className={`h-2.5 w-10 rounded-full transition ${
-              factIndex === index ? "bg-white" : "bg-white/15 hover:bg-white/25"
+            className={`h-1.5 w-8 rounded-full transition-all duration-300 ${
+              factIndex === index 
+                ? "bg-gradient-to-r from-violet-400/80 to-fuchsia-400/80" 
+                : "bg-white/10 hover:bg-white/20"
             }`}
             aria-label={`Show fact ${factIndex + 1}`}
             title={fact.title}
