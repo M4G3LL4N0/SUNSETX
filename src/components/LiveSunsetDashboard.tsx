@@ -28,13 +28,25 @@ type ApiResponse = {
   }
   nearbyRankedLocations: Array<any>
   aiNarrative?: any
-  aiStatus?: "live" | "fallback"
+  aiStatus?: "live" | "cached" | "fallback"
   updatedAt: string
 }
 
 const FALLBACK = {
   lat: 37.5985,
   lon: -122.3872,
+}
+
+function prettyError(message: string) {
+  if (message.includes("429")) {
+    return "Using SUNSETX fallback intelligence right now. Your sunset report is still live."
+  }
+
+  if (message.toLowerCase().includes("quota")) {
+    return "Live AI narration is temporarily unavailable, but your sunset report is still working."
+  }
+
+  return "We hit a temporary live-data issue. Please refresh in a moment."
 }
 
 export default function LiveSunsetDashboard() {
@@ -128,10 +140,27 @@ export default function LiveSunsetDashboard() {
     })
   }, [data])
 
-  if (error) {
+  if (error && !data) {
     return (
-      <section className="rounded-[32px] border border-red-500/20 bg-red-500/5 p-8">
-        <div className="text-sm text-red-300">Live dashboard error: {error}</div>
+      <section className="rounded-[32px] border border-white/10 bg-white/5 p-8 shadow-2xl">
+        <div className="text-sm uppercase tracking-[0.24em] text-zinc-500">
+          Personalized live sunset report
+        </div>
+
+        <div className="mt-4">
+          <h1 className="text-5xl font-semibold tracking-tight md:text-6xl">
+            SUNSETX
+          </h1>
+
+          <div className="mt-6 rounded-3xl border border-white/10 bg-black/30 p-6">
+            <div className="text-lg font-medium text-zinc-100">
+              {prettyError(error)}
+            </div>
+            <div className="mt-3 text-sm leading-6 text-zinc-400">
+              We’re keeping the product graceful under load so the homepage never shows raw provider failures.
+            </div>
+          </div>
+        </div>
       </section>
     )
   }
@@ -167,7 +196,7 @@ export default function LiveSunsetDashboard() {
             {status}
           </span>
           <span className="rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm text-zinc-400">
-            AI: {data.aiStatus === "live" ? "live" : "fallback"}
+            AI: {data.aiStatus === "live" ? "live" : data.aiStatus === "cached" ? "cached" : "fallback"}
           </span>
           <span className="rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm text-zinc-400">
             Updated {new Date(data.updatedAt).toLocaleTimeString()}
@@ -182,7 +211,7 @@ export default function LiveSunsetDashboard() {
             {leaveNow?.copy ?? "Leave timing unavailable."}
           </div>
           {leaveNow?.leaveAt ? (
-            <div className="mt-3 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300 inline-flex">
+            <div className="mt-3 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300">
               Ideal leave time: {leaveNow.leaveAt}
             </div>
           ) : null}

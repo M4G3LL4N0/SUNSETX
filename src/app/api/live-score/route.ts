@@ -129,7 +129,7 @@ export async function GET(req: Request) {
     const cityLabel = inferCityLabel(lat, lon)
     const regionLabel = inferRegionLabel()
 
-    const aiNarrative = await generateAiSunsetNarrative({
+    const aiResult = await generateAiSunsetNarrative({
       cityLabel,
       regionLabel,
       score: skyScore,
@@ -193,8 +193,8 @@ export async function GET(req: Request) {
         },
         nearbyRankedLocations: closestSpots,
         elevationCurve: buildSunElevationCurve(sunsetDate, lat, lon, 45, 45, 5),
-        aiNarrative,
-        aiStatus: aiNarrative ? "live" : "fallback",
+        aiNarrative: aiResult.data,
+        aiStatus: aiResult.status,
         updatedAt: new Date().toISOString(),
       },
       {

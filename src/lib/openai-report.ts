@@ -79,11 +79,18 @@ export async function generateAiSunsetNarrative(input: {
 
   const cached = await getCachedAiSummary(cacheKey)
   if (cached) {
-    return cached
+    return {
+      data: cached,
+      status: "cached" as const,
+    }
   }
 
   if (!client) {
-    return null
+    return {
+      data: null,
+      status: "fallback" as const,
+      reason: "missing_api_key",
+    }
   }
 
   try {
@@ -161,8 +168,7 @@ export async function generateAiSunsetNarrative(input: {
       },
     })
 
-    const text = response.output_text
-    const parsed = JSON.parse(text)
+    const parsed = JSON.parse(response.output_text)
 
     await setCachedAiSummary({
       cacheKey,
@@ -172,9 +178,17 @@ export async function generateAiSunsetNarrative(input: {
       ttlMinutes: 45,
     })
 
-    return parsed
+    return {
+      data: parsed,
+      status: "live" as const,
+    }
   } catch (error) {
     console.error("OpenAI narrative fallback triggered:", error)
-    return null
+
+    return {
+      data: null,
+      status: "fallback" as const,
+      reason: "provider_unavailable",
+    }
   }
 }
