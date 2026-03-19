@@ -8,16 +8,16 @@ export const locations = [
   },
   {
     name: "Redwood Shores Bay Trail",
-    lat: 37.520,
-    lon: -122.250,
+    lat: 37.52,
+    lon: -122.25,
     spotScore: 85,
     scent: 0.75,
   },
   {
     name: "Stafford Park",
     lat: 37.485,
-    lon: -122.240,
+    lon: -122.24,
     spotScore: 84,
     scent: 0.85,
-  }
+  },
 ]

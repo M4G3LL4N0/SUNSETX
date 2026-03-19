@@ -1,9 +1,15 @@
-export function calculateSkyScore(weather: any) {
-  const cloud = weather.clouds / 100
-  const humidity = weather.humidity / 100
-  const visibility = weather.visibility / 10000
+type WeatherInput = {
+  clouds: number
+  humidity: number
+  visibility: number
+  pollution?: number
+}
 
-  const pollution = weather.pollution || 0.2
+export function calculateSkyScore(weather: WeatherInput) {
+  const cloud = (weather.clouds ?? 40) / 100
+  const humidity = (weather.humidity ?? 55) / 100
+  const visibility = Math.min((weather.visibility ?? 10000) / 10000, 1)
+  const pollution = weather.pollution ?? 0.2
 
   const score =
     0.3 * (1 - Math.abs(cloud - 0.5)) +
@@ -12,5 +18,5 @@ export function calculateSkyScore(weather: any) {
     0.15 * (1 - humidity) +
     0.15 * (1 - pollution)
 
-  return Math.round(score * 100)
+  return Math.max(0, Math.min(100, Math.round(score * 100)))
 }

@@ -1,81 +1,69 @@
-import { useEffect, useRef, useState } from "react"
+"use client"
+
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api"
 
 type Location = {
   name: string
   lat: number
   lon: number
-  [key: string]: any
+  score?: number
 }
 
-export default function Map({ locations }: { locations: Location[] }) {
-  const mapRef = useRef<google.maps.Map | null>(null)
-  const [mapsLoaded, setMapsLoaded] = useState(false)
+type MapProps = {
+  locations: Location[]
+}
 
-  useEffect(() => {
-    // Load Google Maps API
-    const loadMaps = () => {
-      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY      if (!apiKey) {
-        console.error("Google Maps API key not found")
-        return
-      }
+const containerStyle = {
+  width: "100%",
+  height: "420px",
+}
 
-      const script = document.createElement("script")
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`
-      script.async = true
-      script.defer = true      window.initMap = () => {
-        setMapsLoaded(true)
-      }
-      document.head.appendChild(script)
-    }
+export default function Map({ locations }: MapProps) {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
-    if (!mapsLoaded) {
-      loadMaps()
-    }
+  const fallbackCenter = {
+    lat: 37.485,
+    lng: -122.23,
+  }
 
-    return () => {
-      // Cleanup
-      window.initMap = null
-    }
-  }, [mapsLoaded])
+  const center =
+    locations.length > 0
+      ? { lat: locations[0].lat, lng: locations[0].lon }
+      : fallbackCenter
 
-  useEffect(() => {
-    if (!mapsLoaded || !mapRef.current || locations.length === 0) return
-
-    // Clear existing markers
-    if (window.markers) {
-      window.markers.forEach((marker: google.maps.Marker) => marker.setMap(null))
-    }
-
-    // Create markers for each location    const markers: google.maps.Marker[] = []
-    const bounds = new google.maps.LatLngBounds()
-
-    locations.forEach((loc) => {
-      const position = new google.maps.LatLng(loc.lat, loc.lon)
-      const marker = new google.maps.Marker({
-        position,
-        map: mapRef.current,
-        title: loc.name,
-      })
-      markers.push(marker)
-      bounds.extend(position)
-    })
-
-    // Fit map to show all markers
-    if (locations.length > 0) {
-      mapRef.current.fitBounds(bounds)
-      // Adjust zoom if only one marker
-      if (locations.length === 1) {
-        mapRef.current.setZoom(15)
-      }
-    }
-
-    window.markers = markers
-  }, [locations, mapsLoaded])
+  if (!apiKey) {
+    return (
+      <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-zinc-400">
+        Google Maps API key missing. Add{" "}
+        <code>NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> to{" "}
+        <code>.env.local</code>.
+      </div>
+    )
+  }
 
   return (
-    <div
-      ref={mapRef}
-      style={{ width: "100%", height: "400px", marginTop: "2rem", borderRadius: "0.5rem" }}
-    />
+    <div className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-2">
+      <LoadScript googleMapsApiKey={apiKey}>
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={center}
+          zoom={11}
+          options={{
+            clickableIcons: false,
+            streetViewControl: false,
+            mapTypeControl: false,
+            fullscreenControl: false,
+          }}
+        >
+          {locations.map((loc) => (
+            <Marker
+              key={`${loc.name}-${loc.lat}-${loc.lon}`}
+              position={{ lat: loc.lat, lng: loc.lon }}
+              title={loc.name}
+            />
+          ))}
+        </GoogleMap>
+      </LoadScript>
+    </div>
   )
 }
