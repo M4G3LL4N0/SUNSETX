@@ -49,6 +49,14 @@ function prettyError(message: string) {
   return "We hit a temporary live-data issue. Please refresh in a moment."
 }
 
+function StatusPill({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-zinc-400">
+      {children}
+    </span>
+  )
+}
+
 export default function LiveSunsetDashboard() {
   const [coords, setCoords] = useState(FALLBACK)
   const [status, setStatus] = useState("Using default location")
@@ -142,22 +150,28 @@ export default function LiveSunsetDashboard() {
 
   if (error && !data) {
     return (
-      <section className="rounded-[32px] border border-white/10 bg-white/5 p-8 shadow-2xl">
-        <div className="text-sm uppercase tracking-[0.24em] text-zinc-500">
-          Personalized live sunset report
-        </div>
+      <section className="overflow-hidden rounded-[36px] border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_30px_120px_rgba(0,0,0,0.45)]">
+        <div className="p-8 md:p-10">
+          <div className="text-sm uppercase tracking-[0.24em] text-zinc-500">
+            Personalized live sunset report
+          </div>
 
-        <div className="mt-4">
-          <h1 className="text-5xl font-semibold tracking-tight md:text-6xl">
-            SUNSETX
-          </h1>
+          <div className="mt-5 max-w-3xl">
+            <h1 className="text-5xl font-semibold tracking-tight md:text-7xl">
+              SUNSETX
+            </h1>
+            <p className="mt-5 text-lg leading-8 text-zinc-300">
+              The premium sunset intelligence layer for where to go, when to leave,
+              and whether tonight is truly worth it.
+            </p>
+          </div>
 
-          <div className="mt-6 rounded-3xl border border-white/10 bg-black/30 p-6">
-            <div className="text-lg font-medium text-zinc-100">
+          <div className="mt-8 rounded-3xl border border-white/10 bg-black/30 p-6">
+            <div className="text-xl font-medium text-zinc-100">
               {prettyError(error)}
             </div>
             <div className="mt-3 text-sm leading-6 text-zinc-400">
-              We’re keeping the product graceful under load so the homepage never shows raw provider failures.
+              SUNSETX keeps the experience graceful under load so users never see raw provider failures.
             </div>
           </div>
         </div>
@@ -167,65 +181,96 @@ export default function LiveSunsetDashboard() {
 
   if (!data || !report) {
     return (
-      <section className="rounded-[32px] border border-white/10 bg-white/5 p-8">
+      <section className="overflow-hidden rounded-[36px] border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_30px_120px_rgba(0,0,0,0.45)] p-8 md:p-10">
         <div className="text-sm text-zinc-400">Loading SUNSETX live engine…</div>
       </section>
     )
   }
 
   return (
-    <section className="rounded-[32px] border border-white/10 bg-white/5 p-8 shadow-2xl">
-      <div className="text-sm uppercase tracking-[0.24em] text-zinc-500">
-        Personalized live sunset report
-      </div>
-
-      <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h1 className="text-5xl font-semibold tracking-tight md:text-6xl">
-            SUNSETX
-          </h1>
-
-          <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-300 md:text-lg">
-            Every visitor sees a live, location-aware sunset report with nearby spots,
-            timing, conditions, narrative explanation, and a clear go / no-go decision.
-          </p>
+    <section className="overflow-hidden rounded-[36px] border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_30px_120px_rgba(0,0,0,0.45)]">
+      <div className="p-8 md:p-10">
+        <div className="text-sm uppercase tracking-[0.24em] text-zinc-500">
+          Personalized live sunset report
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <span className="rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm text-zinc-400">
-            {status}
-          </span>
-          <span className="rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm text-zinc-400">
-            AI: {data.aiStatus === "live" ? "live" : data.aiStatus === "cached" ? "cached" : "fallback"}
-          </span>
-          <span className="rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm text-zinc-400">
-            Updated {new Date(data.updatedAt).toLocaleTimeString()}
-          </span>
-        </div>
-      </div>
+        <div className="mt-6 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+          <div>
+            <h1 className="text-5xl font-semibold tracking-tight md:text-7xl">
+              SUNSETX
+            </h1>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-          <div className="text-sm font-medium text-zinc-100">Leave-now engine</div>
-          <div className="mt-2 text-sm text-zinc-400">
-            {leaveNow?.copy ?? "Leave timing unavailable."}
-          </div>
-          {leaveNow?.leaveAt ? (
-            <div className="mt-3 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300">
-              Ideal leave time: {leaveNow.leaveAt}
+            <p className="mt-5 max-w-3xl text-lg leading-8 text-zinc-300">
+              Every visitor gets a live, location-aware sunset report with nearby
+              spots, timing intelligence, premium narrative guidance, and a clear
+              go / no-go decision.
+            </p>
+
+            <div className="mt-6 flex flex-wrap gap-2">
+              <StatusPill>{status}</StatusPill>
+              <StatusPill>
+                AI: {data.aiStatus === "live" ? "live" : data.aiStatus === "cached" ? "cached" : "fallback"}
+              </StatusPill>
+              <StatusPill>
+                Updated {new Date(data.updatedAt).toLocaleTimeString()}
+              </StatusPill>
             </div>
-          ) : null}
+          </div>
+
+          <div className="rounded-[28px] border border-white/10 bg-black/35 p-6">
+            <div className="text-xs uppercase tracking-[0.24em] text-zinc-500">
+              Tonight
+            </div>
+
+            <div className="mt-3 text-7xl font-bold tracking-tight">
+              {data.skyScore}
+            </div>
+
+            <div className="mt-2 text-base text-zinc-300">
+              Sunset score
+            </div>
+
+            <div className="mt-6 grid gap-3">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Peak window</div>
+                <div className="mt-2 text-lg font-medium text-zinc-100">
+                  {data.peakWindow.start} – {data.peakWindow.end}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Official sunset</div>
+                <div className="mt-2 text-lg font-medium text-zinc-100">
+                  {data.sunsetLocalTime}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <EnableNotifications
-          lat={coords.lat}
-          lon={coords.lon}
-          cityLabel={data.cityLabel}
-          timezoneOffset={data.timezoneOffset}
-        />
-      </div>
+        <div className="mt-8 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-2xl border border-white/10 bg-black/30 p-5">
+            <div className="text-sm font-medium text-zinc-100">Leave-now engine</div>
+            <div className="mt-2 text-sm text-zinc-400">
+              {leaveNow?.copy ?? "Leave timing unavailable."}
+            </div>
+            {leaveNow?.leaveAt ? (
+              <div className="mt-3 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300">
+                Ideal leave time: {leaveNow.leaveAt}
+              </div>
+            ) : null}
+          </div>
 
-      <SunsetReportWidget report={report} />
+          <EnableNotifications
+            lat={coords.lat}
+            lon={coords.lon}
+            cityLabel={data.cityLabel}
+            timezoneOffset={data.timezoneOffset}
+          />
+        </div>
+
+        <SunsetReportWidget report={report} />
+      </div>
     </section>
   )
 }
