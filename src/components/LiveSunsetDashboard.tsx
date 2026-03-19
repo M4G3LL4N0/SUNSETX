@@ -296,59 +296,92 @@ export default function LiveSunsetDashboard() {
       </div>
 
       {/* Widget Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
         {/* Main Score Widget */}
-        <div className="col-span-2 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/10 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
-          <div className="flex items-baseline justify-between">
-            <div className="flex items-baseline gap-1.5">
-              <div className="text-4xl font-bold text-white">{data.skyScore}</div>
-              <div className="text-sm text-zinc-400 font-medium">/ 100</div>
+        <div className="col-span-2 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/10 via-fuchsia-400/5 to-transparent p-3.5 shadow-lg backdrop-blur-xl">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-baseline gap-1">
+                <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-100 to-fuchsia-100">{data.skyScore}</div>
+                <div className="text-sm text-zinc-400 font-medium">/ 100</div>
+              </div>
+              <div className="mt-1 text-sm font-medium text-zinc-300">Tonight's Score</div>
             </div>
-            <div className="text-xs text-zinc-400 font-medium">{status}</div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-zinc-300">{data.cityLabel}</div>
+              <div className="mt-0.5 text-xs text-zinc-400">{status}</div>
+            </div>
           </div>
-          <div className="mt-2 text-sm font-medium text-zinc-300">Tonight's Sunset Score</div>
-          <div className="mt-1.5 text-xs text-zinc-400">{data.cityLabel}</div>
         </div>
 
         {/* Time Widgets */}
         <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.03] to-white/[0.01] p-3 shadow-lg backdrop-blur-xl">
-          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">Peak Start</div>
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Peak Start</div>
           <div className="text-lg font-medium text-white">{data.peakWindow.start}</div>
-          <div className="mt-1 text-xs text-zinc-400">Best color window</div>
+          <div className="mt-0.5 text-xs text-zinc-400">Best color</div>
         </div>
 
         <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.03] to-white/[0.01] p-3 shadow-lg backdrop-blur-xl">
-          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">Sunset</div>
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Sunset</div>
           <div className="text-lg font-medium text-white">{data.sunsetLocalTime}</div>
-          <div className="mt-1 text-xs text-zinc-400">Official time</div>
+          <div className="mt-0.5 text-xs text-zinc-400">Official time</div>
+        </div>
+      </div>
+
+      {/* Conditions Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-3 shadow-lg backdrop-blur-xl">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Clouds</div>
+          <div className="text-lg font-medium text-white">{data.liveConditions.clouds}%</div>
+          <div className="mt-0.5 text-xs text-zinc-400">Coverage</div>
+        </div>
+
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-3 shadow-lg backdrop-blur-xl">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Visibility</div>
+          <div className="text-lg font-medium text-white">{data.liveConditions.visibilityMiles} mi</div>
+          <div className="mt-0.5 text-xs text-zinc-400">Range</div>
+        </div>
+
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-3 shadow-lg backdrop-blur-xl">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Humidity</div>
+          <div className="text-lg font-medium text-white">{data.liveConditions.humidity}%</div>
+          <div className="mt-0.5 text-xs text-zinc-400">Current</div>
+        </div>
+
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-3 shadow-lg backdrop-blur-xl">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Wind</div>
+          <div className="text-lg font-medium text-white">{data.liveConditions.windMph} mph</div>
+          <div className="mt-0.5 text-xs text-zinc-400">Speed</div>
         </div>
       </div>
 
       {/* Top Spot & Leave Now */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-6">
         {/* Top Spot Card */}
-        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl">
-          <div className="text-sm font-medium text-zinc-100 mb-4">Top Spot</div>
-          <div>
-            <div className="text-2xl font-semibold text-white mb-2">{topSpot?.name ?? "Nearby spot"}</div>
-            <div className="text-zinc-300 mb-4">{topSpot?.address}</div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-zinc-200">
-              <span>~{topSpot?.driveMinutes ?? 0} min drive</span>
-              <span>•</span>
-              <span>{topSpot?.distanceMiles ?? 0} miles</span>
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-500/5 via-fuchsia-500/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Best Spot Tonight</div>
+              <div className="text-xl font-medium text-white">{topSpot?.name ?? "Nearby spot"}</div>
+              <div className="mt-1 text-sm text-zinc-400">{topSpot?.address}</div>
+            </div>
+            <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-zinc-300">
+              <span>~{topSpot?.driveMinutes ?? 0}m</span>
+              <span className="text-zinc-500">•</span>
+              <span>{topSpot?.distanceMiles ?? 0}mi</span>
             </div>
           </div>
         </div>
 
         {/* Leave Now Card */}
-        <div className="rounded-[24px] border border-white/10 bg-gradient-to-br from-orange-900/20 via-amber-900/10 to-transparent p-8 backdrop-blur-xl">
-          <div className="text-sm font-medium text-zinc-100 mb-4">Leave-Now Engine</div>
-          <div className="text-xl text-zinc-200 mb-4">
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-amber-500/5 via-orange-500/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
+          <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1.5">Leave-Now Status</div>
+          <div className="text-lg text-zinc-200 mb-2">
             {leaveNow?.copy ?? "Leave timing unavailable."}
           </div>
           {leaveNow?.leaveAt ? (
-            <div className="inline-flex rounded-full border border-white/10 bg-white/10 px-6 py-3 text-base font-medium text-zinc-200">
-              Ideal leave time: {leaveNow.leaveAt}
+            <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-medium text-zinc-300">
+              Leave at {leaveNow.leaveAt}
             </div>
           ) : null}
         </div>
