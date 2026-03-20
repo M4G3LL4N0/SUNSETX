@@ -1,3 +1,5 @@
-export const renderError = (error: string) => (
+import React from "react";
+
+export const renderError = (error: string): JSX.Element => (
   <div className="text-zinc-400 text-red-500">{error}</div>
-)
+);

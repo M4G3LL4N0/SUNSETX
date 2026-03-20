@@ -1,9 +1,9 @@
-export const fetchData = async (url: string, options: RequestInit = {}) => {
+export const fetchData = async (url: string, options: RequestInit = {}): Promise<any> => {
   const response = await fetch(url, {
-    ...options,
+   ...options,
     headers: {
       "Content-Type": "application/json",
-      ...options.headers,
+     ...options.headers,
     },
   });
   if (!response.ok) {
@@ -11,4 +11,4 @@ export const fetchData = async (url: string, options: RequestInit = {}) => {
     throw new Error(`HTTP ${response.status}: ${errorBody}`);
   }
   return response.json();
-}
+};

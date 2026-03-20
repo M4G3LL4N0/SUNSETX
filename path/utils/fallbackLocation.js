@@ -1,4 +1,4 @@
-export const reverseGeocode = async (lat: number, lon: number) => {
+export const reverseGeocode = async (lat: number, lon: number): Promise<string | null> => {
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`
@@ -15,4 +15,4 @@ export const reverseGeocode = async (lat: number, lon: number) => {
     console.error(err);
     return null;
   }
-}
+};
