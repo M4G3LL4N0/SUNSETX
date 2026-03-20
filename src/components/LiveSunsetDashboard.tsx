@@ -2,158 +2,428 @@
 
 import { useEffect, useMemo, useState } from "react"
 import SunsetReportWidget from "@/components/SunsetReportWidget"
+import EnableNotifications from "@/components/EnableNotifications"
+import ShareLiveCard from "@/components/ShareLiveCard"
 import { generateSunsetReport } from "@/lib/report"
 import { getLeaveNowStatus } from "@/lib/leave-now"
-import { showNotification } from "@/utils/notifications"
 
-type Props = {
-  initialCoords: { lat: number; lon: number }
-  cityLabel?: string | null
+type NearbySpot = {
+  id?: string
+  name: string
+  address: string
+  score: number
+  spotScore: number
+  scent: number
+  smellLabel: string
+  parkingLabel: string
+  vibeLabel: string
+  bestFor: string
+  whyItWins: string
+  panoramaLabel: string
+  easeLabel: string
+  waterLabel: string
+  distanceMiles: number
+  driveMinutes: number
 }
 
-export default function LiveSunsetDashboard({ initialCoords, cityLabel }: Props) {
-  const [data, setData] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-  const [coords, setCoords] = useState(initialCoords)
+type ApiResponse = {
+  cityLabel?: string
+  regionLabel?: string
+  timezoneOffset?: number
+  skyScore: number
+  afterglowScore: number
+  sunsetLocalTime: string
+  peakWindow: {
+    start: string
+    end: string
+  }
+  explanation: string
+  liveConditions: {
+    clouds: number
+    humidity: number
+    visibilityMiles: number
+    windMph: number
+    sunElevation: number
+    summary: string
+  }
+  nearbyRankedLocations: NearbySpot[]
+  aiNarrative?: {
+    title?: string
+    intro?: string
+    whyTonightIsGood?: {
+      cloudStructure?: string
+      atmosphere?: string
+      wind?: string
+    }
+    whatToExpect?: string[]
+    avoid?: string[]
+    decision?: {
+      goNoGo?: string
+      bestMove?: string
+    }
+  }
+  aiStatus?: "live" | "cached" | "fallback"
+  updatedAt: string
+}
 
-  // Watch for location changes
+type Props = {
+  initialCoords?: {
+    lat: number
+    lon: number
+  }
+}
+
+const FALLBACK_COORDS = {
+  lat: 37.5985,
+  lon: -122.3872,
+}
+
+function buildEmergencyData(): ApiResponse {
+  const now = new Date()
+  const sunset = new Date(now)
+  sunset.setHours(18, 43, 0, 0)
+
+  const peakStart = new Date(sunset.getTime() - 5 * 60 * 1000)
+  const peakEnd = new Date(sunset.getTime() + 5 * 60 * 1000)
+
+  const fmt = (d: Date) =>
+    d.toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit",
+    })
+
+  return {
+    cityLabel: "Your Area",
+    regionLabel: "Live fallback region",
+    timezoneOffset: -25200,
+    skyScore: 82,
+    afterglowScore: 78,
+    sunsetLocalTime: fmt(sunset),
+    peakWindow: {
+      start: fmt(peakStart),
+      end: fmt(peakEnd),
+    },
+    explanation:
+      "Balanced cloud layer for color reflection · good visibility · balanced atmospheric softness · good afterglow potential",
+    liveConditions: {
+      clouds: 42,
+      humidity: 58,
+      visibilityMiles: 9.2,
+      windMph: 6.1,
+      sunElevation: -1.8,
+      summary: "partly cloudy",
+    },
+    nearbyRankedLocations: [
+      {
+        id: "fallback-1",
+        name: "Nearby Scenic Spot",
+        address: "Live location fallback",
+        score: 91,
+        spotScore: 91,
+        scent: 0.95,
+        smellLabel: "clean, natural air",
+        parkingLabel: "Easy",
+        vibeLabel: "Quiet, scenic",
+        bestFor: "quick sunset access",
+        whyItWins: "Strong fallback sunset option while live location refreshes.",
+        panoramaLabel: "Open horizon",
+        easeLabel: "Very easy",
+        waterLabel: "Low water smell risk",
+        distanceMiles: 3.4,
+        driveMinutes: 9,
+      },
+      {
+        id: "fallback-2",
+        name: "Hillside Overlook",
+        address: "Live location fallback",
+        score: 88,
+        spotScore: 88,
+        scent: 0.9,
+        smellLabel: "dry grass, hillside air",
+        parkingLabel: "Easy",
+        vibeLabel: "Elevated, expansive",
+        bestFor: "higher elevation",
+        whyItWins: "Elevation supports stronger sky intensity.",
+        panoramaLabel: "High hillside panorama",
+        easeLabel: "Easy",
+        waterLabel: "Low water smell risk",
+        distanceMiles: 4.8,
+        driveMinutes: 11,
+      },
+      {
+        id: "fallback-3",
+        name: "Open Bay View",
+        address: "Live location fallback",
+        score: 84,
+        spotScore: 84,
+        scent: 0.75,
+        smellLabel: "clean, slight water",
+        parkingLabel: "Easy",
+        vibeLabel: "Open, airy",
+        bestFor: "wide sky and reflections",
+        whyItWins: "Open sky helps color spread.",
+        panoramaLabel: "Open shoreline sky",
+        easeLabel: "Very easy",
+        waterLabel: "Moderate water presence",
+        distanceMiles: 2.9,
+        driveMinutes: 8,
+      },
+    ],
+    aiNarrative: {
+      title: "SUNSETX REPORT — YOUR AREA",
+      intro:
+        "Using fallback sunset intelligence while live location updates.",
+    },
+    aiStatus: "fallback",
+    updatedAt: new Date().toISOString(),
+  }
+}
+
+function Pill({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-medium text-zinc-200">
+      {children}
+    </span>
+  )
+}
+
+function MiniCard({
+  title,
+  value,
+  subtitle,
+  className = "",
+}: {
+  title: string
+  value: string
+  subtitle?: string
+  className?: string
+}) {
+  return (
+    <div className={`rounded-[24px] border border-white/10 p-4 backdrop-blur-2xl ${className}`}>
+      <div className="text-[11px] uppercase tracking-[0.22em] text-zinc-400">{title}</div>
+      <div className="mt-2 text-2xl font-semibold tracking-tight text-white">{value}</div>
+      {subtitle ? <div className="mt-1 text-xs text-zinc-300">{subtitle}</div> : null}
+    </div>
+  )
+}
+
+function getUserKey() {
+  if (typeof window === "undefined") return "anonymous"
+  const existing = localStorage.getItem("sunsetx:user-key")
+  if (existing) return existing
+
+  const next = crypto.randomUUID()
+  localStorage.setItem("sunsetx:user-key", next)
+  return next
+}
+
+export default function LiveSunsetDashboard({ initialCoords }: Props) {
+  const [coords, setCoords] = useState(initialCoords ?? FALLBACK_COORDS)
+  const [userKey, setUserKey] = useState("anonymous")
+  const [status, setStatus] = useState("Initializing live location")
+  const [data, setData] = useState<ApiResponse | null>(null)
+  const [fallbackMode, setFallbackMode] = useState(false)
+  const [hasLiveCoords, setHasLiveCoords] = useState(false)
+
   useEffect(() => {
-    const watchId = navigator.geolocation.watchPosition(
+    setUserKey(getUserKey())
+
+    const saved = localStorage.getItem("sunsetx:last-location")
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (typeof parsed.lat === "number" && typeof parsed.lon === "number") {
+          setCoords(parsed)
+          setStatus("Using saved location while refreshing live location")
+        }
+      } catch {}
+    } else {
+      setStatus("Using fallback location while requesting live location")
+    }
+
+    if (!navigator.geolocation) {
+      setStatus("Geolocation unavailable, using fallback location")
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const newCoords = {
+        const next = {
           lat: Number(pos.coords.latitude.toFixed(6)),
           lon: Number(pos.coords.longitude.toFixed(6)),
         }
-        console.log('Location updated:', newCoords)
-        setCoords(newCoords)
+
+        setCoords(next)
+        setHasLiveCoords(true)
+        setStatus("Using your live location")
+        localStorage.setItem("sunsetx:last-location", JSON.stringify(next))
       },
-      (err) => {
-        console.error('Geolocation error:', err)
-        showNotification('Location tracking paused', 'warning')
+      () => {
+        setStatus("Location permission denied, using saved/fallback location")
       },
-      { enableHighAccuracy: true, maximumAge: 30000 }
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 120000,
+      }
     )
-    
-    return () => navigator.geolocation.clearWatch(watchId)
   }, [])
 
   useEffect(() => {
+    let active = true
+
     const load = async () => {
-      setLoading(true)
       try {
         const res = await fetch(
-          `/api/live-score?lat=${coords.lat}&lon=${coords.lon}`,
+          `/api/live-score?lat=${coords.lat}&lon=${coords.lon}&userKey=${encodeURIComponent(userKey)}`,
           { cache: "no-store" }
         )
-        if (!res.ok) throw new Error('API failed')
-        
+
         const json = await res.json()
-        console.log('API response:', json)
-        setData(json)
-        setError(false)
-      } catch (err) {
-        console.error('Failed to load sunset data:', err)
-        setError(true)
-        // Fallback to default sunset data
-        setData({
-          skyScore: 75,
-          sunsetLocalTime: '7:14 PM',
-          peakWindow: {
-            start: '6:59 PM',
-            end: '7:29 PM'
-          }
-        })
-      } finally {
-        setLoading(false)
+
+        if (!res.ok) {
+          throw new Error(json?.error || `Failed: ${res.status}`)
+        }
+
+        if (active) {
+          setData(json)
+          setFallbackMode(false)
+        }
+      } catch {
+        if (active) {
+          setData(buildEmergencyData())
+          setFallbackMode(true)
+        }
       }
     }
 
-    const timer = setInterval(load, 120000) // Refresh every 2 minutes
-    load() // Initial load
-    
-    return () => clearInterval(timer)
-  }, [coords.lat, coords.lon])
+    if (userKey !== "anonymous") {
+      load()
+      const id = window.setInterval(load, 300000)
 
-  const report = useMemo(() => {
-    try {
-      return data ? generateSunsetReport(data as any) : null
-    } catch (e) {
-      console.error("Report generation failed:", e)
-      return null
+      return () => {
+        active = false
+        window.clearInterval(id)
+      }
     }
+  }, [coords.lat, coords.lon, userKey])
+
+  const report = useMemo(() => (data ? generateSunsetReport(data) : null), [data])
+
+  const leaveNow = useMemo(() => {
+    const top = data?.nearbyRankedLocations?.[0]
+    if (!top || !data) return null
+
+    return getLeaveNowStatus({
+      peakStart: data.peakWindow.start,
+      driveMinutes: top.driveMinutes ?? 10,
+    })
   }, [data])
 
   const topSpot = data?.nearbyRankedLocations?.[0]
 
-  const leaveNow = useMemo(() => {
-    if (!data || !topSpot) return null
-    try {
-      return getLeaveNowStatus({
-        peakStart: data.peakWindow?.start,
-        driveMinutes: topSpot?.driveMinutes ?? 10,
-      })
-    } catch {
-      return null
-    }
-  }, [data, topSpot])
-
-  if (loading || !data || !report) {
+  if (!data || !report) {
     return (
-      <div className="space-y-4 animate-pulse">
-        <div className="h-4 w-40 rounded-full bg-white/10" />
-        <div className="grid grid-cols-2 gap-3">
-          {[...Array(2)].map((_, i) => (
-            <div key={i} className="h-16 rounded-xl bg-white/5" />
-          ))}
-        </div>
-        <div className="h-16 rounded-xl bg-white/5" />
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-20 rounded-xl bg-white/5" />
-        ))}
-      </div>
+      <section className="rounded-[32px] border border-white/10 bg-white/5 p-6 backdrop-blur-2xl">
+        <div className="text-sm text-zinc-400">Loading SUNSETX live engine…</div>
+      </section>
     )
   }
 
   return (
-    <div className="space-y-4">
-      <div className="text-sm text-zinc-300">
-        {cityLabel 
-          ? `Near ${cityLabel}`
-          : `Lat ${coords.lat} · Lon ${coords.lon}`
-        }
-        {error && (
-          <span className="ml-2 text-xs text-amber-400">
-            (using offline data)
-          </span>
-        )}
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div className="p-4 rounded-xl bg-white/5">
-          Score: {data.skyScore}
-        </div>
-        <div className="p-4 rounded-xl bg-white/5">
-          Sunset: {data.sunsetLocalTime}
-        </div>
-      </div>
-
-      <div className="p-4 rounded-xl bg-white/5">
-        Leave Now: {leaveNow?.copy || "—"}
-      </div>
-
-      <div className="space-y-2">
-        {(data.nearbyRankedLocations || []).slice(0, 3).map((spot: any) => (
-          <div key={spot.name} className="p-3 rounded-xl bg-white/5">
-            <div className="font-semibold">{spot.name}</div>
-            <div className="text-sm text-zinc-400">
-              {spot.driveMinutes} min · {spot.score}
-            </div>
+    <section className="overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl md:p-6">
+      <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.28em] text-zinc-400">
+            Personalized live sunset report
           </div>
-        ))}
+
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-6xl">
+            SUNSETX
+          </h1>
+
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-300 md:text-base">
+            Every visitor sees a location-aware sunset report with nearby spots,
+            timing intelligence, premium narrative guidance, and a clear go / no-go decision.
+          </p>
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Pill>{status}</Pill>
+            <Pill>Mode: {fallbackMode ? "Fallback" : "Live"}</Pill>
+            <Pill>{hasLiveCoords ? "Live GPS active" : "Waiting for live GPS"}</Pill>
+            <Pill>
+              Lat {coords.lat} · Lon {coords.lon}
+            </Pill>
+            <Pill>Updated {new Date(data.updatedAt).toLocaleTimeString()}</Pill>
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <MiniCard
+            title="Tonight"
+            value={`${data.skyScore}`}
+            subtitle="Sunset score"
+            className="bg-[linear-gradient(135deg,rgba(244,114,182,0.22),rgba(251,146,60,0.16),rgba(56,189,248,0.14))]"
+          />
+          <MiniCard
+            title="Peak"
+            value={data.peakWindow.start}
+            subtitle={`${data.peakWindow.start} – ${data.peakWindow.end}`}
+            className="bg-[linear-gradient(135deg,rgba(59,130,246,0.18),rgba(168,85,247,0.16))]"
+          />
+          <MiniCard
+            title="Sunset"
+            value={data.sunsetLocalTime}
+            subtitle="Official sunset"
+            className="bg-[linear-gradient(135deg,rgba(251,146,60,0.18),rgba(244,114,182,0.14))]"
+          />
+          <MiniCard
+            title="Top Spot"
+            value={topSpot?.name ?? "Nearby spot"}
+            subtitle={`~${topSpot?.driveMinutes ?? 0} min away`}
+            className="bg-[linear-gradient(135deg,rgba(34,197,94,0.16),rgba(16,185,129,0.10))]"
+          />
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
+          <div className="text-sm font-medium text-zinc-100">Leave-now engine</div>
+          <div className="mt-2 text-sm text-zinc-300">
+            {leaveNow?.copy ?? "Leave timing unavailable."}
+          </div>
+          {leaveNow?.leaveAt ? (
+            <div className="mt-3 inline-flex rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-zinc-200">
+              Ideal leave time: {leaveNow.leaveAt}
+            </div>
+          ) : null}
+        </div>
+
+        <EnableNotifications
+          lat={coords.lat}
+          lon={coords.lon}
+          cityLabel={data.cityLabel}
+          timezoneOffset={data.timezoneOffset}
+        />
+
+        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
+          <div className="text-sm font-medium text-zinc-100">Share</div>
+          <div className="mt-2 text-sm text-zinc-300">
+            Create a live sunset share card from your current report.
+          </div>
+          <div className="mt-4">
+            <ShareLiveCard
+              cityLabel={data.cityLabel}
+              score={data.skyScore}
+              peakStart={data.peakWindow.start}
+              peakEnd={data.peakWindow.end}
+              bestSpot={topSpot?.name}
+            />
+          </div>
+        </div>
       </div>
 
       <SunsetReportWidget report={report} />
-    </div>
+    </section>
   )
 }
