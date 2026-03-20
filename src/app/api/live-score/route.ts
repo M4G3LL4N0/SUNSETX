@@ -40,7 +40,11 @@ export async function GET(req: Request) {
         sunElevation: -2,
         summary: "partly cloudy",
       },
-      nearbyRankedLocations: spots,
+      nearbyRankedLocations: [
+        ...spots.filter(s => s.tier === "close").slice(0, 3),
+        ...spots.filter(s => s.tier === "premium").slice(0, 1),
+        ...spots.filter(s => s.tier === "destination").slice(0, 1)
+      ],
       updatedAt: new Date().toISOString(),
     })
   } catch (e) {

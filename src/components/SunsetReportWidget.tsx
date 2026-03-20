@@ -78,14 +78,25 @@ function Card({
   title,
   children,
   className = "",
+  tier,
 }: {
   title?: string
   children: React.ReactNode
   className?: string
+  tier?: "quick" | "premium" | "destination"
 }) {
+  const tierGradients = {
+    quick: "from-violet-400/5 via-fuchsia-400/5",
+    premium: "from-amber-500/5 to-yellow-400/5",
+    destination: "from-pink-500/5 to-fuchsia-600/5",
+    default: "from-violet-400/5 via-fuchsia-400/5"
+  };
+
   return (
     <div
-      className={`rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-400/5 via-fuchsia-400/5 to-transparent p-3 shadow-lg backdrop-blur-xl ${className}`}
+      className={`rounded-2xl border border-white/[0.08] bg-gradient-to-br ${
+        tierGradients[tier || "default"]
+      } to-transparent p-3 shadow-lg backdrop-blur-xl ${className}`}
     >
       {title ? (
         <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">
@@ -97,9 +108,20 @@ function Card({
   )
 }
 
-function SpotCard({ spot, index, label }: { spot: Spot; index: number; label?: string }) {
+function SpotCard({ spot, index, label, className = "" }: { 
+  spot: Spot; 
+  index: number; 
+  label?: string;
+  className?: string;
+}) {
+  const tierBg = {
+    close: "bg-white/5",
+    premium: "bg-gradient-to-b from-yellow-500/5 to-amber-600/5",
+    destination: "bg-gradient-to-b from-pink-500/5 to-fuchsia-600/5",
+  }[spot.tier || "close"];
+
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-3 backdrop-blur-xl">
+    <div className={`rounded-2xl border border-white/10 p-3 backdrop-blur-xl ${tierBg} ${className}`}>
       <div className="flex items-start justify-between gap-2">
         <div>
           {label && (

@@ -162,7 +162,12 @@ export function generateSunsetReport(data: LiveScorePayload) {
             "Leaving late and missing the real peak",
           ],
 
-    spots,
+    spots: {
+      quickOptions: data.nearbyRankedLocations.filter(s => s.tier === "close").slice(0, 3),
+      premiumOption: data.nearbyRankedLocations.find(s => s.tier === "premium") || null,
+      destinationSpot: data.nearbyRankedLocations.find(s => s.tier === "destination") || null,
+      allSpots: data.nearbyRankedLocations
+    },
 
     decision: {
       goNoGo:
