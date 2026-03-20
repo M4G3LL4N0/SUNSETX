@@ -1,11 +1,15 @@
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
+import { generateNearbySpots } from '../../lib/spots'
+
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url)
     const lat = Number(url.searchParams.get("lat") || 37.5985)
     const lon = Number(url.searchParams.get("lon") || -122.3872)
+    
+    const nearbySpots = await generateNearbySpots(lat, lon)
 
     const now = new Date()
     const sunset = new Date()

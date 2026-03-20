@@ -1,4 +1,13 @@
 export type SunsetSpot = {
+  name: string
+  driveMinutes: number
+  distanceMiles: number
+  score: number
+  elevationScore: number
+  opennessScore: number  
+  scentScore: number
+  crowdPenalty: number
+  reasons: string[]
   id: string
   name: string
   address: string

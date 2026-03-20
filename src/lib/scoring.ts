@@ -1,4 +1,4 @@
-type SunsetScoreInput = {
+export type SunsetScoreInput = {
   clouds: number
   humidity: number
   visibilityMiles: number
