@@ -77,7 +77,7 @@ export default function GlobalSunsetBoard() {
   }
 
   return (
-    <section className="mt-8 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-100 to-fuchsia-100 p-4 md:p-6 shadow-lg backdrop-blur-xl">
+    <section className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-100 to-fuchsia-100 p-3 md:p-4 shadow-lg backdrop-blur-xl">
       <div className="text-[14px] text-zinc-400">Global sunset board</div>
       <div className="text-2xl font-bold text-violet-100">Best sunset windows worldwide</div>
       <div className="text-sm text-zinc-300">Updated {new Date(board.updatedAt).toLocaleTimeString()}</div>

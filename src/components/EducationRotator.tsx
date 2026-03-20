@@ -97,7 +97,7 @@ export default function EducationRotator() {
   }
 
   return (
-    <section className="mt-6 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-4 shadow-lg backdrop-blur-xl">
+    <section className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.02] to-transparent p-3 shadow-lg backdrop-blur-xl">
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-wide text-zinc-500">
