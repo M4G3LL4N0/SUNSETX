@@ -161,7 +161,7 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
   const premiumSpot = report.spots[4] || null
 
   return (
-    <section className="mt-3 space-y-2">
+    <section className="mt-2 space-y-2">
       <div className="rounded-[24px] border border-white/[0.08] bg-gradient-to-br from-violet-400/10 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
         <div className="flex items-start justify-between gap-4">
           <div>

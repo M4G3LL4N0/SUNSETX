@@ -331,7 +331,7 @@ export default function LiveSunsetDashboard({ initialCoords }: Props) {
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-[0_8px_32px_rgba(0,0,0,0.25)] backdrop-blur-2xl md:p-5">
+    <section className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.06] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.25)] backdrop-blur-lg">
       <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <div className="text-[11px] uppercase tracking-[0.28em] text-zinc-400">
