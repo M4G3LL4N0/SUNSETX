@@ -31,7 +31,7 @@ export default function ShareLiveCard({
     <button
       type="button"
       onClick={share}
-      className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-gradient-to-r from-pink-500 to-orange-500 px-6 py-2.5 text-sm font-medium text-white shadow-lg hover:from-pink-600 hover:to-orange-600 transition-all duration-300"
+      className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500/90 to-orange-500/90 px-6 py-3 text-sm font-semibold text-white shadow-xl hover:from-pink-600/90 hover:to-orange-600/90 transition-all duration-300 hover:shadow-2xl hover:scale-105"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

@@ -406,12 +406,12 @@ export default function LiveSunsetDashboard({ initialCoords }: Props) {
           timezoneOffset={data.timezoneOffset}
         />
 
-        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
-          <div className="text-sm font-medium text-zinc-100">Share</div>
+        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
+          <div className="text-lg font-semibold text-zinc-100">Share Your Sunset</div>
           <div className="mt-2 text-sm text-zinc-300">
-            Create a live sunset share card from your current report.
+            Create a premium sunset card to share with friends. Includes your live sunset score, peak window, and top nearby spot.
           </div>
-          <div className="mt-4">
+          <div className="mt-6">
             <ShareLiveCard
               cityLabel={data.cityLabel}
               score={data.skyScore}
@@ -419,6 +419,9 @@ export default function LiveSunsetDashboard({ initialCoords }: Props) {
               peakEnd={data.peakWindow.end}
               bestSpot={topSpot?.name}
             />
+          </div>
+          <div className="mt-4 text-xs text-zinc-400">
+            Shared cards update live with your current sunset report.
           </div>
         </div>
       </div>

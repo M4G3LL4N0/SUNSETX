@@ -19,46 +19,82 @@ export async function GET(req: Request) {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          alignItems: "flex-start",
+          alignItems: "center",
           padding: "72px",
           background:
-            "linear-gradient(180deg, #050505 0%, #111111 45%, #1d1208 100%)",
+            "linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a1a0a 100%)",
           color: "#ffffff",
+          textAlign: "center",
         }}
       >
-        <div style={{ display: "flex", fontSize: 28, letterSpacing: 4, opacity: 0.7 }}>
-          SUNSETX
+        <div style={{ 
+          display: "flex",
+          fontSize: 32,
+          letterSpacing: 2,
+          opacity: 0.8,
+          fontWeight: 500,
+          marginBottom: 40,
+          background: "linear-gradient(45deg, #f472b6, #fb923c)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent"
+        }}>
+          SUNSETX PREMIUM
         </div>
 
         <div
           style={{
             display: "flex",
-            fontSize: 64,
+            fontSize: 96,
+            fontWeight: 800,
+            marginBottom: 24,
+            lineHeight: 1,
+            background: "linear-gradient(45deg, #fb923c, #f472b6)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent"
+          }}
+        >
+          {score} ⭐️
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            fontSize: 48,
             fontWeight: 700,
-            marginTop: 20,
+            marginBottom: 40,
+            opacity: 0.9,
           }}
         >
           {city}
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            fontSize: 120,
-            fontWeight: 800,
-            marginTop: 20,
-            lineHeight: 1,
-          }}
-        >
-          {score} 🔥
+        <div style={{ 
+          display: "flex",
+          fontSize: 28,
+          marginBottom: 12,
+          opacity: 0.9,
+          fontWeight: 500
+        }}>
+          Peak Window: {peak}
         </div>
 
-        <div style={{ display: "flex", fontSize: 28, marginTop: 24, opacity: 0.9 }}>
-          Peak: {peak}
+        <div style={{ 
+          display: "flex",
+          fontSize: 24,
+          opacity: 0.8,
+          fontWeight: 500
+        }}>
+          Top Spot: {bestSpot}
         </div>
 
-        <div style={{ display: "flex", fontSize: 24, marginTop: 12, opacity: 0.75 }}>
-          Best nearby: {bestSpot}
+        <div style={{
+          position: "absolute",
+          bottom: 48,
+          fontSize: 18,
+          opacity: 0.6,
+          fontWeight: 400
+        }}>
+          sunsetx.app
         </div>
       </div>
     ),
