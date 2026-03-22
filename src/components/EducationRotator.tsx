@@ -100,11 +100,14 @@ export default function EducationRotator() {
     <section className="rounded-xl border border-white/[0.08] bg-white/[0.05] p-3 backdrop-blur-lg">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <div className="text-[11px] uppercase tracking-wide text-zinc-500">
-            Learn while you watch
+          <div className="flex items-center gap-2">
+            <div className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">
+              SUNSET SCIENCE
+            </div>
+            <div className="h-px w-6 bg-gradient-to-r from-orange-400/60 to-pink-400/60"></div>
           </div>
-          <h2 className="mt-1.5 text-lg font-medium text-white">
-            Sunset intelligence
+          <h2 className="mt-1.5 text-xl font-semibold tracking-tight text-white">
+            Expert Sunset Insights
           </h2>
         </div>
 
