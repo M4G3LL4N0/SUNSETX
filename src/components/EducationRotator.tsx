@@ -117,9 +117,9 @@ export default function EducationRotator() {
         </button>
       </div>
 
-      <div className="mt-4 rounded-xl border border-white/[0.08] bg-gradient-to-br from-white/[0.03] to-transparent p-4 shadow-lg backdrop-blur-xl">
+      <div className="mt-4 rounded-xl border border-white/[0.06] bg-gradient-to-br from-white/[0.03] to-black/30 p-5 backdrop-blur-xl shadow-[0_8px_30px_rgba(248,113,113,0.05)]">
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-[11px] font-medium text-zinc-300">
+          <span className="rounded-full border border-white/[0.06] bg-white/[0.02] px-2.5 py-1 text-[11px] font-medium text-white">
             {current.category}
           </span>
           <span className="rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-[11px] font-medium text-zinc-400">
