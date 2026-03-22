@@ -1,20 +1,34 @@
 import "./globals.css"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
+import React from "react"
 
 export const metadata: Metadata = {
-  title: "SUNSETX",
+  title: {
+    default: "SUNSETX",
+    template: "%s | SUNSETX",
+  },
   description:
-    "SUNSETX predicts and ranks the best sunset experiences using weather, timing, location, and environmental signals.",
+    "Predicts and ranks the best sunset experiences using weather, timing, and location data.",
+  applicationName: "SUNSETX",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://sunsetx.vercel.app"),
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+}
+
+interface RootLayoutProps {
   children: React.ReactNode
-}>) {
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen bg-black text-white">
+        {children}
+      </body>
     </html>
   )
 }
