@@ -42,7 +42,7 @@ export async function GET(req: Request) {
       },
       nearbyRankedLocations: [
         ...spots.filter(s => s.tier === "close").slice(0, 3),
-        ...spots.filter(s => s.tier === "premium").slice(0, 1),
+        ...spots.filter(s => s.tier === "mid").slice(0, 1),
         ...spots.filter(s => s.tier === "destination").slice(0, 1)
       ],
       updatedAt: new Date().toISOString(),
