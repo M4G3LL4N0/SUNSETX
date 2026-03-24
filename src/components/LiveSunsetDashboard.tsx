@@ -218,7 +218,16 @@ function getUserKey() {
 }
 
 export default function LiveSunsetDashboard({ initialCoords }: Props) {
-  const [coords, setCoords] = useState(initialCoords ?? FALLBACK_COORDS)
+  const [coords, setCoords] = useState(() => {
+    if (initialCoords && 
+        typeof initialCoords.lat === 'number' &&
+        typeof initialCoords.lon === 'number' &&
+        initialCoords.lat >= -90 && initialCoords.lat <= 90 &&
+        initialCoords.lon >= -180 && initialCoords.lon <= 180) {
+      return initialCoords
+    }
+    return FALLBACK_COORDS
+  })
   const [userKey, setUserKey] = useState("anonymous")
   const [status, setStatus] = useState("Initializing live location")
   const [data, setData] = useState<ApiResponse | null>(null)
@@ -246,21 +255,26 @@ export default function LiveSunsetDashboard({ initialCoords }: Props) {
       return
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const next = {
-          lat: Number(pos.coords.latitude.toFixed(6)),
-          lon: Number(pos.coords.longitude.toFixed(6)),
-        }
+    try {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const next = {
+            lat: Number(pos.coords.latitude.toFixed(6)),
+            lon: Number(pos.coords.longitude.toFixed(6)),
+          }
 
-        setCoords(next)
-        setHasLiveCoords(true)
-        setStatus("Using your live location")
-        localStorage.setItem("sunsetx:last-location", JSON.stringify(next))
-      },
-      () => {
-        setStatus("Location permission denied, using saved/fallback location")
-      },
+          if (next.lat >= -90 && next.lat <= 90 && next.lon >= -180 && next.lon <= 180) {
+            setCoords(next)
+            setHasLiveCoords(true)
+            setStatus("Using your live location")
+            localStorage.setItem("sunsetx:last-location", JSON.stringify(next))
+          } else {
+            setStatus("Invalid coordinates, using fallback")
+          }
+        },
+        () => {
+          setStatus("Location permission denied, using saved/fallback location")
+        },
       {
         enableHighAccuracy: true,
         timeout: 15000,
@@ -326,6 +340,9 @@ export default function LiveSunsetDashboard({ initialCoords }: Props) {
     return (
       <section className="rounded-[32px] border border-white/10 bg-white/5 p-6 backdrop-blur-2xl">
         <div className="text-sm text-zinc-400">Loading SUNSETX live engine…</div>
+        <div className="mt-2 text-xs text-zinc-500">
+          {status}
+        </div>
       </section>
     )
   }
