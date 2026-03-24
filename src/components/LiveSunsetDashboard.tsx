@@ -11,6 +11,8 @@ type NearbySpot = {
   id?: string
   name: string
   address: string
+  lat?: number
+  lon?: number
   score: number
   spotScore: number
   scent: number
@@ -22,8 +24,11 @@ type NearbySpot = {
   panoramaLabel: string
   easeLabel: string
   waterLabel: string
+  woodsyBias?: number
   distanceMiles: number
   driveMinutes: number
+  reasons?: string[]
+  tier?: "close" | "mid" | "destination"
 }
 
 type ApiResponse = {
@@ -66,19 +71,12 @@ type ApiResponse = {
   updatedAt: string
 }
 
-type Props = {
-  initialCoords?: {
-    lat: number
-    lon: number
-  }
-}
-
 const FALLBACK_COORDS = {
   lat: 37.5985,
   lon: -122.3872,
 }
 
-function buildEmergencyData(): ApiResponse {
+function buildEmergencyData(coords: { lat: number; lon: number }): ApiResponse {
   const now = new Date()
   const sunset = new Date(now)
   sunset.setHours(18, 43, 0, 0)
@@ -93,7 +91,7 @@ function buildEmergencyData(): ApiResponse {
     })
 
   return {
-    cityLabel: "Your Area",
+    cityLabel: `${coords.lat.toFixed(3)}, ${coords.lon.toFixed(3)} area`,
     regionLabel: "Live fallback region",
     timezoneOffset: -25200,
     skyScore: 82,
@@ -131,6 +129,7 @@ function buildEmergencyData(): ApiResponse {
         waterLabel: "Low water smell risk",
         distanceMiles: 3.4,
         driveMinutes: 9,
+        tier: "close",
       },
       {
         id: "fallback-2",
@@ -149,6 +148,7 @@ function buildEmergencyData(): ApiResponse {
         waterLabel: "Low water smell risk",
         distanceMiles: 4.8,
         driveMinutes: 11,
+        tier: "mid",
       },
       {
         id: "fallback-3",
@@ -167,12 +167,12 @@ function buildEmergencyData(): ApiResponse {
         waterLabel: "Moderate water presence",
         distanceMiles: 2.9,
         driveMinutes: 8,
+        tier: "destination",
       },
     ],
     aiNarrative: {
       title: "SUNSETX REPORT — YOUR AREA",
-      intro:
-        "Using fallback sunset intelligence while live location updates.",
+      intro: "Using fallback sunset intelligence while live location updates.",
     },
     aiStatus: "fallback",
     updatedAt: new Date().toISOString(),
@@ -217,17 +217,8 @@ function getUserKey() {
   return next
 }
 
-export default function LiveSunsetDashboard({ initialCoords }: Props) {
-  const [coords, setCoords] = useState(() => {
-    if (initialCoords && 
-        typeof initialCoords.lat === 'number' &&
-        typeof initialCoords.lon === 'number' &&
-        initialCoords.lat >= -90 && initialCoords.lat <= 90 &&
-        initialCoords.lon >= -180 && initialCoords.lon <= 180) {
-      return initialCoords
-    }
-    return FALLBACK_COORDS
-  })
+export default function LiveSunsetDashboard() {
+  const [coords, setCoords] = useState(FALLBACK_COORDS)
   const [userKey, setUserKey] = useState("anonymous")
   const [status, setStatus] = useState("Initializing live location")
   const [data, setData] = useState<ApiResponse | null>(null)
@@ -245,7 +236,9 @@ export default function LiveSunsetDashboard({ initialCoords }: Props) {
           setCoords(parsed)
           setStatus("Using saved location while refreshing live location")
         }
-      } catch {}
+      } catch {
+        setStatus("Using fallback location while requesting live location")
+      }
     } else {
       setStatus("Using fallback location while requesting live location")
     }
@@ -255,26 +248,20 @@ export default function LiveSunsetDashboard({ initialCoords }: Props) {
       return
     }
 
-    try {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const next = {
-            lat: Number(pos.coords.latitude.toFixed(6)),
-            lon: Number(pos.coords.longitude.toFixed(6)),
-          }
-
-          if (next.lat >= -90 && next.lat <= 90 && next.lon >= -180 && next.lon <= 180) {
-            setCoords(next)
-            setHasLiveCoords(true)
-            setStatus("Using your live location")
-            localStorage.setItem("sunsetx:last-location", JSON.stringify(next))
-          } else {
-            setStatus("Invalid coordinates, using fallback")
-          }
-        },
-        () => {
-          setStatus("Location permission denied, using saved/fallback location")
-        },
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const next = {
+          lat: Number(pos.coords.latitude.toFixed(6)),
+          lon: Number(pos.coords.longitude.toFixed(6)),
+        }
+        setCoords(next)
+        setHasLiveCoords(true)
+        setStatus("Using your live location")
+        localStorage.setItem("sunsetx:last-location", JSON.stringify(next))
+      },
+      () => {
+        setStatus("Location permission denied, using saved/fallback location")
+      },
       {
         enableHighAccuracy: true,
         timeout: 15000,
@@ -286,13 +273,12 @@ export default function LiveSunsetDashboard({ initialCoords }: Props) {
   useEffect(() => {
     let active = true
 
-    const load = async () => {
+    async function load() {
       try {
         const res = await fetch(
           `/api/live-score?lat=${coords.lat}&lon=${coords.lon}&userKey=${encodeURIComponent(userKey)}`,
           { cache: "no-store" }
         )
-
         const json = await res.json()
 
         if (!res.ok) {
@@ -305,7 +291,7 @@ export default function LiveSunsetDashboard({ initialCoords }: Props) {
         }
       } catch {
         if (active) {
-          setData(buildEmergencyData())
+          setData(buildEmergencyData(coords))
           setFallbackMode(true)
         }
       }
@@ -320,18 +306,30 @@ export default function LiveSunsetDashboard({ initialCoords }: Props) {
         window.clearInterval(id)
       }
     }
+
+    return undefined
   }, [coords.lat, coords.lon, userKey])
 
-  const report = useMemo(() => (data ? generateSunsetReport(data) : null), [data])
+  const report = useMemo(() => {
+    try {
+      return data ? generateSunsetReport(data as never) : null
+    } catch {
+      return null
+    }
+  }, [data])
 
   const leaveNow = useMemo(() => {
     const top = data?.nearbyRankedLocations?.[0]
     if (!top || !data) return null
 
-    return getLeaveNowStatus({
-      peakStart: data.peakWindow.start,
-      driveMinutes: top.driveMinutes ?? 10,
-    })
+    try {
+      return getLeaveNowStatus({
+        peakStart: data.peakWindow.start,
+        driveMinutes: top.driveMinutes ?? 10,
+      })
+    } catch {
+      return null
+    }
   }, [data])
 
   const topSpot = data?.nearbyRankedLocations?.[0]
@@ -340,15 +338,12 @@ export default function LiveSunsetDashboard({ initialCoords }: Props) {
     return (
       <section className="rounded-[32px] border border-white/10 bg-white/5 p-6 backdrop-blur-2xl">
         <div className="text-sm text-zinc-400">Loading SUNSETX live engine…</div>
-        <div className="mt-2 text-xs text-zinc-500">
-          {status}
-        </div>
       </section>
     )
   }
 
   return (
-    <section className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.06] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.25)] backdrop-blur-lg">
+    <section className="overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl md:p-6">
       <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <div className="text-[11px] uppercase tracking-[0.28em] text-zinc-400">
@@ -360,8 +355,8 @@ export default function LiveSunsetDashboard({ initialCoords }: Props) {
           </h1>
 
           <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-300 md:text-base">
-            Every visitor sees a location-aware sunset report with nearby spots,
-            timing intelligence, premium narrative guidance, and a clear go / no-go decision.
+            Every visitor sees a location-aware sunset report with nearby spots, timing intelligence,
+            premium narrative guidance, and a clear go / no-go decision.
           </p>
 
           <div className="mt-5 flex flex-wrap gap-2">
@@ -423,12 +418,12 @@ export default function LiveSunsetDashboard({ initialCoords }: Props) {
           timezoneOffset={data.timezoneOffset}
         />
 
-        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
-          <div className="text-lg font-semibold text-zinc-100">Share Your Sunset</div>
+        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
+          <div className="text-sm font-medium text-zinc-100">Share</div>
           <div className="mt-2 text-sm text-zinc-300">
-            Create a premium sunset card to share with friends. Includes your live sunset score, peak window, and top nearby spot.
+            Create a live sunset share card from your current report.
           </div>
-          <div className="mt-6">
+          <div className="mt-4">
             <ShareLiveCard
               cityLabel={data.cityLabel}
               score={data.skyScore}
@@ -436,9 +431,6 @@ export default function LiveSunsetDashboard({ initialCoords }: Props) {
               peakEnd={data.peakWindow.end}
               bestSpot={topSpot?.name}
             />
-          </div>
-          <div className="mt-4 text-xs text-zinc-400">
-            Shared cards update live with your current sunset report.
           </div>
         </div>
       </div>
