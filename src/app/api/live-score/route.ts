@@ -3,12 +3,24 @@ import { generateNearbySpots } from "@/lib/spots"
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
+const CACHE = new Map<string, { data: any, timestamp: number }>()
+
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url)
     const lat = Number(url.searchParams.get("lat") || 37.5985)
     const lon = Number(url.searchParams.get("lon") || -122.3872)
+    
+    // Create cache key based on rounded coordinates
+    const cacheKey = `${lat.toFixed(3)}_${lon.toFixed(3)}`
+    
+    // Check cache first
+    const cached = CACHE.get(cacheKey)
+    if (cached && Date.now() - cached.timestamp < 300000) { // 5 minute cache
+      return Response.json(cached.data)
+    }
 
+    // Generate fresh data
     const now = new Date()
     const sunset = new Date()
     sunset.setHours(18, 45, 0, 0)
@@ -16,9 +28,12 @@ export async function GET(req: Request) {
     const peakStart = "6:40 PM"
     const peakEnd = "6:50 PM"
 
-    const spots = generateNearbySpots(lat, lon, 82)
+    // Only generate spots we need
+    const closeSpots = generateNearbySpots(lat, lon, 82).filter(s => s.tier === "close").slice(0, 3)
+    const midSpot = generateNearbySpots(lat, lon, 82).find(s => s.tier === "mid")
+    const destinationSpot = generateNearbySpots(lat, lon, 82).find(s => s.tier === "destination")
 
-    return Response.json({
+    const responseData = {
       cityLabel: `${lat.toFixed(3)}, ${lon.toFixed(3)}`,
       regionLabel: `Live sunset report for ${lat.toFixed(3)}, ${lon.toFixed(3)}`,
       sunsetLocalTime: sunset.toLocaleTimeString([], {
@@ -41,12 +56,20 @@ export async function GET(req: Request) {
         summary: "partly cloudy",
       },
       nearbyRankedLocations: [
-        ...spots.filter(s => s.tier === "close").slice(0, 3),
-        ...spots.filter(s => s.tier === "mid").slice(0, 1),
-        ...spots.filter(s => s.tier === "destination").slice(0, 1)
+        ...closeSpots,
+        ...(midSpot ? [midSpot] : []),
+        ...(destinationSpot ? [destinationSpot] : [])
       ],
       updatedAt: new Date().toISOString(),
+    }
+
+    // Update cache
+    CACHE.set(cacheKey, {
+      data: responseData,
+      timestamp: Date.now()
     })
+
+    return Response.json(responseData)
   } catch (e) {
     return Response.json(
       { error: "fallback live-score error" },
