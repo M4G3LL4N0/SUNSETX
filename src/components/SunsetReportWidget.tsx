@@ -114,14 +114,34 @@ function SpotCard({ spot, index, label, className = "" }: {
   label?: string;
   className?: string;
 }) {
-  const tierBg = {
-    close: "bg-white/5",
-    premium: "bg-gradient-to-b from-yellow-500/5 to-amber-600/5",
-    destination: "bg-gradient-to-b from-pink-500/5 to-fuchsia-600/5",
+  const tierClasses = {
+    close: `
+      bg-gradient-to-br from-violet-600/10 via-fuchsia-600/8 to-transparent
+      shadow-[0_8px_40px_-15px_rgba(139,92,246,0.2)]
+      hover:shadow-[0_12px_50px_-12px_rgba(139,92,246,0.25)]
+    `,
+    premium: `
+      bg-gradient-to-br from-amber-500/10 to-yellow-400/8
+      shadow-[0_8px_40px_-15px_rgba(245,158,11,0.2)]
+      hover:shadow-[0_12px_50px_-12px_rgba(245,158,11,0.25)]
+    `,
+    destination: `
+      bg-gradient-to-br from-pink-600/10 to-fuchsia-600/8
+      shadow-[0_8px_40px_-15px_rgba(219,39,119,0.2)]
+      hover:shadow-[0_12px_50px_-12px_rgba(219,39,119,0.25)]
+    `,
   }[spot.tier || "close"];
 
   return (
-    <div className={`rounded-2xl border border-white/10 p-3 backdrop-blur-xl ${tierBg} ${className}`}>
+    <div className={`
+      rounded-2xl border border-white/15 p-3 backdrop-blur-xl
+      transition-all duration-300 ease-in-out
+      relative isolate overflow-hidden
+      after:absolute after:insect-0 after:rounded-2xl
+      after:pointer-events-none after:bg-gradient-to-b 
+      after:from-white/[0.02] after:to-white/0
+      ${tierClasses} ${className}
+    `}>
       <div className="flex items-start justify-between gap-2">
         <div>
           {label && (

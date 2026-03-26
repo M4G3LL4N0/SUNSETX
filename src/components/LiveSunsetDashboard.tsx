@@ -199,10 +199,27 @@ function MiniCard({
   className?: string
 }) {
   return (
-    <div className={`rounded-[24px] border border-white/10 p-4 backdrop-blur-2xl ${className}`}>
+    <div className={`
+      rounded-[24px] border border-white/15 p-4 backdrop-blur-2xl
+      bg-gradient-to-br from-white/[0.03] to-white/[0.01]
+      shadow-[0_8px_32px_-8px_rgba(0,0,0,0.2)]
+      hover:shadow-[0_12px_40px_-12px_rgba(0,0,0,0.25)]
+      transition-all duration-300 ease-in-out
+      relative isolate overflow-hidden
+      after:absolute after:inset-0 after:rounded-[24px]
+      after:pointer-events-none after:bg-gradient-to-b 
+      after:from-white/[0.02] after:to-white/0
+      ${className}
+    `}>
       <div className="text-[11px] uppercase tracking-[0.22em] text-zinc-400">{title}</div>
-      <div className="mt-2 text-2xl font-semibold tracking-tight text-white">{value}</div>
-      {subtitle ? <div className="mt-1 text-xs text-zinc-300">{subtitle}</div> : null}
+      <div className="mt-2 text-2xl font-semibold tracking-tight text-white">
+        <span className="bg-gradient-to-r from-violet-200 to-fuchsia-200 bg-clip-text text-transparent">
+          {value}
+        </span>
+      </div>
+      {subtitle ? (
+        <div className="mt-1 text-xs text-zinc-300/80">{subtitle}</div>
+      ) : null}
     </div>
   )
 }
