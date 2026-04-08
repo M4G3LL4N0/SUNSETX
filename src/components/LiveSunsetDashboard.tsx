@@ -5,7 +5,14 @@ import ShareLiveCard from "@/components/ShareLiveCard"
 import PerfectSunsetFramework from "@/components/PerfectSunsetFramework"
 import EnableNotifications from "@/components/EnableNotifications"
 import { generateSunsetReport } from "@/lib/report"
-import { getLeaveNowStatus, type LeaveNowStatus } from "@/lib/leave-now"
+import { getLeaveNowStatus } from "@/lib/leave-now"
+
+type LeaveNowStatus = {
+  leaveAt: string
+  shouldLeaveNow: boolean
+  urgency: "unknown" | "now" | "soon" | "later"
+  copy: string
+}
 
 type NearbySpot = {
   id?: string
