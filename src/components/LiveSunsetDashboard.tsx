@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react"
 import ShareLiveCard from "@/components/ShareLiveCard"
-import { PerfectSunsetFramework as SunsetReportWidget } from "@/components/PerfectSunsetFramework"
-import { Share as EnableNotifications } from "@/components/Share"
+import PerfectSunsetFramework from "@/components/PerfectSunsetFramework"
+import EnableNotifications from "@/components/EnableNotifications"
 import { generateSunsetReport } from "@/lib/report"
 import { getLeaveNowStatus, type LeaveNowStatus } from "@/lib/leave-now"
 
@@ -226,12 +226,18 @@ function MiniCard({
 
 function getUserKey() {
   if (typeof window === "undefined") return "anonymous"
-  const existing = localStorage.getItem("sunsetx:user-key")
-  if (existing) return existing
+  
+  try {
+    const existing = localStorage.getItem("sunsetx:user-key")
+    if (existing) return existing
 
-  const next = crypto.randomUUID()
-  localStorage.setItem("sunsetx:user-key", next)
-  return next
+    const next = crypto.randomUUID()
+    localStorage.setItem("sunsetx:user-key", next)
+    return next
+  } catch (error) {
+    console.error('Failed to get/set user key:', error)
+    return "anonymous-" + Math.random().toString(36).substring(2, 9)
+  }
 }
 
 export default function LiveSunsetDashboard() {
@@ -260,7 +266,7 @@ export default function LiveSunsetDashboard() {
       setStatus("Using fallback location while requesting live location")
     }
 
-    if (!navigator.geolocation) {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
       setStatus("Geolocation unavailable, using fallback location")
       return
     }
@@ -459,7 +465,7 @@ export default function LiveSunsetDashboard() {
         </div>
       </div>
 
-      <SunsetReportWidget />
+      <PerfectSunsetFramework />
     </section>
   )
 }
