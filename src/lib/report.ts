@@ -1,3 +1,55 @@
+export type SunsetReport = {
+  header: {
+    title: string
+    dateLabel: string
+    regionLabel: string
+    preferenceLabel: string
+    intro: string
+  }
+  summary: {
+    score: number
+    rating: string
+    worthIt: string
+    bullets: string[]
+  }
+  timing: {
+    goldenHourStart: string
+    peakWindow: string
+    sunsetOfficial: string
+    afterglow: string
+    leaveBy: string
+  }
+  whyTonightIsGood: {
+    cloudStructure: string
+    atmosphere: string
+    wind: string
+  }
+  conditions: {
+    clouds: number
+    humidity: number
+    visibility: number
+    wind: number
+    explanation: string
+  }
+  whatToExpect: string[]
+  avoid: string[]
+  spots: {
+    quickOptions: Spot[]
+    premiumOption: Spot | null
+    destinationSpot: Spot | null
+    allSpots: Spot[]
+  }
+  decision: {
+    goNoGo: string
+    bestMove: string
+  }
+  productInsight: {
+    title: string
+    combinedSignals: string[]
+    becomes: string[]
+  }
+}
+
 export type Spot = {
   id?: string
   name: string
