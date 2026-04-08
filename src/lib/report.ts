@@ -1,4 +1,4 @@
-type Spot = {
+export type Spot = {
   id?: string
   name: string
   address: string
@@ -17,7 +17,7 @@ type Spot = {
   driveMinutes: number
 }
 
-type LiveScorePayload = {
+export interface LiveScorePayload {
   cityLabel?: string
   regionLabel?: string
   skyScore: number
@@ -90,7 +90,7 @@ function buildSummaryBullets(score: number) {
   ]
 }
 
-export function generateSunsetReport(data: LiveScorePayload) {
+export function generateSunsetReport(data: LiveScorePayload): SunsetReport {
   const spots = (data.nearbyRankedLocations ?? []).slice(0, 3)
   const bestSpot = spots[0]
 
