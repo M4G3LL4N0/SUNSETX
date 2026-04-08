@@ -17,6 +17,7 @@ type Spot = {
   waterLabel: string
   distanceMiles: number
   driveMinutes: number
+  tier?: "close" | "premium" | "destination"
 }
 
 type Report = {
@@ -114,7 +115,7 @@ function SpotCard({ spot, index, label, className = "" }: {
   label?: string;
   className?: string;
 }) {
-  const tierClasses = {
+  const tierClasses: Record<string, string> = {
     close: `
       bg-gradient-to-br from-violet-600/10 via-fuchsia-600/8 to-transparent
       shadow-[0_8px_40px_-15px_rgba(139,92,246,0.2)]
@@ -130,7 +131,10 @@ function SpotCard({ spot, index, label, className = "" }: {
       shadow-[0_8px_40px_-15px_rgba(219,39,119,0.2)]
       hover:shadow-[0_12px_50px_-12px_rgba(219,39,119,0.25)]
     `,
-  }[spot.tier || "close"];
+  };
+  
+  const selectedTier = spot.tier || "close";
+  const classes = tierClasses[selectedTier];
 
   return (
     <div className={`
@@ -140,7 +144,7 @@ function SpotCard({ spot, index, label, className = "" }: {
       after:absolute after:insect-0 after:rounded-2xl
       after:pointer-events-none after:bg-gradient-to-b 
       after:from-white/[0.02] after:to-white/0
-      ${tierClasses} ${className}
+      ${classes} ${className}
     `}>
       <div className="flex items-start justify-between gap-2">
         <div>
