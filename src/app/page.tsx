@@ -18,7 +18,7 @@ export default function Home() {
 
       <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-3">
-          <div className="lg:col-span-8 space-y-2 sm:space-y-3">
+          <div className="lg:col-span-8 space-y-3 sm:space-y-4">
             <LiveSunsetDashboard />
             <EducationRotator />
           </div>
