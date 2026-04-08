@@ -3,8 +3,8 @@ import GlobalSunsetBoard from "@/components/GlobalSunsetBoard"
 import PerfectSunsetFramework from "@/components/PerfectSunsetFramework"
 import LiveSunsetDashboard from "@/components/LiveSunsetDashboard"
 
-export const dynamic = "force-dynamic"
-export const revalidate = 0
+// Page will be statically generated with ISR
+export const revalidate = 3600 // 1 hour
 
 export default function Home() {
   return (
