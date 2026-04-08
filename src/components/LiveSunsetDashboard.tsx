@@ -1,11 +1,11 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import SunsetReportWidget from "@/components/SunsetReportWidget"
-import EnableNotifications from "@/components/EnableNotifications"
 import ShareLiveCard from "@/components/ShareLiveCard"
+import { PerfectSunsetFramework as SunsetReportWidget } from "@/components/PerfectSunsetFramework"
+import { Share as EnableNotifications } from "@/components/Share"
 import { generateSunsetReport } from "@/lib/report"
-import { getLeaveNowStatus } from "@/lib/leave-now"
+import { getLeaveNowStatus, type LeaveNowStatus } from "@/lib/leave-now"
 
 type NearbySpot = {
   id?: string
@@ -329,13 +329,13 @@ export default function LiveSunsetDashboard() {
 
   const report = useMemo(() => {
     try {
-      return data ? generateSunsetReport(data as never) : null
+      return data ? generateSunsetReport(data) : null
     } catch {
       return null
     }
   }, [data])
 
-  const leaveNow = useMemo(() => {
+  const leaveNow = useMemo<LeaveNowStatus | null>(() => {
     const top = data?.nearbyRankedLocations?.[0]
     if (!top || !data) return null
 
@@ -421,9 +421,16 @@ export default function LiveSunsetDashboard() {
           <div className="mt-2 text-sm text-zinc-300">
             {leaveNow?.copy ?? "Leave timing unavailable."}
           </div>
-          {leaveNow?.leaveAt ? (
-            <div className="mt-3 inline-flex rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-zinc-200">
-              Ideal leave time: {leaveNow.leaveAt}
+          {leaveNow ? (
+            <div className="mt-3 flex gap-2">
+              <div className="inline-flex rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-zinc-200">
+                Ideal leave time: {leaveNow.leaveAt}
+              </div>
+              {leaveNow.urgency !== "unknown" && (
+                <div className="inline-flex rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-zinc-200">
+                  Status: {leaveNow.urgency}
+                </div>
+              )}
             </div>
           ) : null}
         </div>
@@ -452,7 +459,7 @@ export default function LiveSunsetDashboard() {
         </div>
       </div>
 
-      <SunsetReportWidget report={report} />
+      <SunsetReportWidget />
     </section>
   )
 }
