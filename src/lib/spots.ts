@@ -12,6 +12,7 @@ export type GeneratedSpot = {
   smellLabel: string
   parkingLabel: string
   vibeLabel: string
+  tier?: 'close' | 'premium' | 'destination'
   bestFor: string
   whyItWins: string
   panoramaLabel: string

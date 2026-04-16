@@ -9,6 +9,9 @@ const nextConfig = {
   images: {
     domains: ['images.unsplash.com'],
   },
+  turbopack: {
+    root: __dirname,
+  },
 }
 
 module.exports = nextConfig

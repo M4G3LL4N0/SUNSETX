@@ -1,6 +1,12 @@
 import "./globals.css"
+import { Inter } from 'next/font/google'
 import type { Metadata, Viewport } from "next"
 import React from "react"
+
+const inter = Inter({ 
+  subsets: ['latin'],
+  weight: ['400', '500', '600']
+})
 
 export const metadata: Metadata = {
   title: {
@@ -25,7 +31,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.className}>
       <body className="min-h-screen bg-black text-white">
         {children}
       </body>
