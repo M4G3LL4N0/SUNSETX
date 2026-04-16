@@ -1,3 +1,7 @@
+export type SunsetSpot = GeneratedSpot & {
+  tier: "close" | "mid" | "destination";
+}
+
 export type GeneratedSpot = {
   id: string
   name: string
