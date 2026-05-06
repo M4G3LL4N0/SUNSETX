@@ -51,9 +51,11 @@ export type SunsetReport = {
 }
 
 export type Spot = {
-  id?: string
+  id: string
   name: string
   address: string
+  lat: number
+  lon: number
   score: number
   spotScore: number
   scent: number
@@ -65,8 +67,11 @@ export type Spot = {
   panoramaLabel: string
   easeLabel: string
   waterLabel: string
+  woodsyBias: number
   distanceMiles: number
   driveMinutes: number
+  reasons: string[]
+  tier: "close" | "mid" | "destination"
 }
 
 export interface LiveScorePayload {
@@ -89,6 +94,8 @@ export interface LiveScorePayload {
     summary: string
   }
   nearbyRankedLocations: Spot[]
+  updatedAt?: string
+  timezoneOffset?: number
   aiNarrative?: {
     title?: string
     intro?: string
@@ -143,8 +150,8 @@ function buildSummaryBullets(score: number) {
 }
 
 export function generateSunsetReport(data: LiveScorePayload): SunsetReport {
-  const spots = (data.nearbyRankedLocations ?? []).slice(0, 3)
-  const bestSpot = spots[0]
+  const allSpots = data.nearbyRankedLocations ?? []
+  const bestSpot = allSpots[0]
 
   return {
     header: {
@@ -216,7 +223,7 @@ export function generateSunsetReport(data: LiveScorePayload): SunsetReport {
 
     spots: {
       quickOptions: data.nearbyRankedLocations.filter(s => s.tier === "close").slice(0, 3),
-      premiumOption: data.nearbyRankedLocations.find(s => s.tier === "premium") || null,
+      premiumOption: data.nearbyRankedLocations.find(s => s.tier === "mid") || null,
       destinationSpot: data.nearbyRankedLocations.find(s => s.tier === "destination") || null,
       allSpots: data.nearbyRankedLocations
     },

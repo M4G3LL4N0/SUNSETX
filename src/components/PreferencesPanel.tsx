@@ -2,6 +2,40 @@
 
 import { useEffect, useState } from "react"
 
+function Toggle({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean
+  onChange: (c: boolean) => void
+  label: string
+}) {
+  return (
+    <label className="flex items-center justify-between cursor-pointer py-2">
+      <span className="text-base text-zinc-200">{label}</span>
+      <div className="relative">
+        <input
+          type="checkbox"
+          className="sr-only"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+        />
+        <div
+          className={`w-12 h-7 rounded-full transition-all duration-300 ${
+            checked ? "bg-gradient-to-r from-pink-500 to-orange-500" : "bg-white/10"
+          }`}
+        ></div>
+        <div
+          className={`absolute left-1 top-1 w-5 h-5 rounded-full bg-white shadow-lg transition-transform duration-300 ${
+            checked ? "translate-x-5" : ""
+          }`}
+        ></div>
+      </div>
+    </label>
+  )
+}
+
 export default function PreferencesPanel({
   userKey,
 }: {
@@ -49,39 +83,6 @@ export default function PreferencesPanel({
 
     setStatus(res.ok ? "Saved." : "Failed to save.")
   }
-
-  // Custom toggle switch component
-  const Toggle = ({
-    checked,
-    onChange,
-    label,
-  }: {
-    checked: boolean
-    onChange: (c: boolean) => void
-    label: string
-  }) => (
-    <label className="flex items-center justify-between cursor-pointer py-2">
-      <span className="text-base text-zinc-200">{label}</span>
-      <div className="relative">
-        <input
-          type="checkbox"
-          className="sr-only"
-          checked={checked}
-          onChange={(e) => onChange(e.target.checked)}
-        />
-        <div
-          className={`w-12 h-7 rounded-full transition-all duration-300 ${
-            checked ? "bg-gradient-to-r from-pink-500 to-orange-500" : "bg-white/10"
-          }`}
-        ></div>
-        <div
-          className={`absolute left-1 top-1 w-5 h-5 rounded-full bg-white shadow-lg transition-transform duration-300 ${
-            checked ? "translate-x-5" : ""
-          }`}
-        ></div>
-      </div>
-    </label>
-  )
 
   return (
     <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-6 md:p-8 backdrop-blur-xl">

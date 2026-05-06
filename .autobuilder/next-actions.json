@@ -1,0 +1,52 @@
+{
+  "prioritized_tasks": [
+    {
+      "priority": 1,
+      "task": "stabilize live location engine",
+      "why": "Location accuracy drives every recommendation and the user's trust.",
+      "acceptance": "GPS, saved location, fallback, reverse-geocoded label, and timezone are all clear and fallback-safe."
+    },
+    {
+      "priority": 2,
+      "task": "improve real spot data",
+      "why": "Generated spot names are useful for fallback but not enough for a trustworthy local MVP.",
+      "acceptance": "Top spots use real names, addresses, map URLs, lat/lon, parking/access notes, and curated sunset rationale."
+    },
+    {
+      "priority": 3,
+      "task": "add Google Maps or Places enrichment",
+      "why": "Real drive time, distance, place quality, and nearby options improve viability.",
+      "acceptance": "API keys are server-safe, failures are hidden, and fallback spots remain complete."
+    },
+    {
+      "priority": 4,
+      "task": "improve share card",
+      "why": "The share card is the viral loop and should feel premium.",
+      "acceptance": "Share output includes score, peak window, best spot, and a visual card route or image."
+    },
+    {
+      "priority": 5,
+      "task": "add daily notifications safely",
+      "why": "Daily reminders can create retention if configuration is validated.",
+      "acceptance": "No build-time VAPID crashes, no raw push errors, opt-in only, and graceful unavailable state."
+    },
+    {
+      "priority": 6,
+      "task": "compact global leaderboard",
+      "why": "It supports the product story but must not distract from tonight's local decision.",
+      "acceptance": "Leaderboard is small, fast, fallback-safe, and styled like a secondary widget."
+    },
+    {
+      "priority": 7,
+      "task": "polish mobile experience",
+      "why": "The product is naturally mobile-first and should feel like an iOS widget board.",
+      "acceptance": "No text overflow, no bloated sections, strong first viewport, and clean compact spacing."
+    },
+    {
+      "priority": 8,
+      "task": "remove fallback leakage",
+      "why": "Fallback mode should feel trustworthy, not like an internal error state.",
+      "acceptance": "Fallback labels are subtle and user-facing; no provider or internal failure language appears."
+    }
+  ]
+}

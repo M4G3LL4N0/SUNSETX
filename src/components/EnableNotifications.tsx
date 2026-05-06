@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4)
@@ -27,6 +27,16 @@ export default function EnableNotifications({
   timezoneOffset?: number
 }) {
   const [status, setStatus] = useState("")
+  const [isSafe, setIsSafe] = useState(false)
+
+  useEffect(() => {
+    setIsSafe(
+      Boolean(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) &&
+        "serviceWorker" in navigator &&
+        "PushManager" in window &&
+        "Notification" in window
+    )
+  }, [])
 
   const enable = async () => {
     try {
@@ -45,7 +55,7 @@ export default function EnableNotifications({
       const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
 
       if (!vapidKey) {
-        setStatus("Missing public VAPID key.")
+        setStatus("Notifications are not available yet.")
         return
       }
 
@@ -69,18 +79,19 @@ export default function EnableNotifications({
       })
 
       if (!res.ok) {
-        const json = await res.json()
-        throw new Error(json?.error || "Failed to save push subscription")
+        throw new Error("Notifications are not available yet.")
       }
 
       setStatus("Notifications enabled.")
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Failed to enable notifications")
+      setStatus(error instanceof Error ? error.message : "Failed to enable notifications.")
     }
   }
 
+  if (!isSafe) return null
+
   return (
-    <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-100 to-fuchsia-100 p-4 shadow-lg backdrop-blur-xl">
+    <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4 shadow-lg backdrop-blur-xl">
       <div className="text-[14px] text-zinc-400">Notifications</div>
       <div className="mt-2 text-sm text-zinc-300">Get daily sunset alerts and leave-now reminders.</div>
       <button

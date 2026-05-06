@@ -1,0 +1,149 @@
+{
+  "project_folder": "/Users/joshuadavis/startups/sunsetx",
+  "startup_name": "SUNSETX",
+  "aliases": ["SunsetX", "sunsetx"],
+  "domain": "sunsetx.vercel.app",
+  "category": "consumer location intelligence / weather decision product",
+  "stage": "mvp",
+  "one_line_description": "Live sunset intelligence that tells people if tonight is worth it, when to go, and where to watch nearby.",
+  "target_users": [
+    "people deciding whether to watch tonight's sunset",
+    "mobile-first local explorers",
+    "photographers and casual sunset watchers",
+    "people who care about parking, smell, access, and view quality"
+  ],
+  "core_problem": "Sunset decisions are time-sensitive and fragmented across weather, maps, drive time, local knowledge, and personal comfort.",
+  "core_solution": "A compact location-aware dashboard with sunset score, peak window, afterglow estimate, leave-now guidance, ranked nearby spots, an upgraded option, a destination option, notifications, and shareable cards.",
+  "differentiation": "Scores the full human sunset experience: clouds, humidity, visibility, wind, timing, smell, parking, ease, panorama, water presence, distance, and drive time.",
+  "mvp_scope": [
+    "homepage works without auth",
+    "browser geolocation with saved-location and fallback modes",
+    "fallback-safe live-score API",
+    "iOS-style widget board",
+    "ranked spot recommendations",
+    "share card entry point",
+    "safe notification entry point"
+  ],
+  "website": {
+    "main_routes": ["/"],
+    "api_routes": [
+      "/api/live-score",
+      "/api/global-sunset-board",
+      "/api/perfect-sunset",
+      "/api/share",
+      "/api/preferences",
+      "/api/favorites",
+      "/api/push-subscribe",
+      "/api/push-send",
+      "/api/push-leave-now",
+      "/api/cron/daily-report"
+    ],
+    "deployment": "Manual Vercel production deploy only: pnpm install, pnpm build, vercel --prod"
+  },
+  "product": {
+    "core_outputs": [
+      "sunset score",
+      "worth it yes/no",
+      "official sunset time",
+      "peak window",
+      "afterglow window",
+      "leave-now guidance",
+      "3 quick nearby sunset spots",
+      "1 upgraded option within about 30 minutes",
+      "1 wider-area destination option within about 1 hour",
+      "go/no-go decision",
+      "best move",
+      "shareable sunset card"
+    ],
+    "location_order": ["live GPS", "saved localStorage location", "fallback coordinates"]
+  },
+  "design_system": {
+    "style": "Apple-inspired, latest iOS widget aesthetic, glossy, translucent, compact, premium, cinematic, dark luxury",
+    "accent_colors": ["soft blue", "violet", "pink", "amber", "cyan"],
+    "avoid": ["emoji", "admin dashboard look", "generic SaaS template", "long scrolling report", "homepage preferences panel"]
+  },
+  "technical_stack": {
+    "framework": "Next.js 16 app router",
+    "package_manager": "pnpm",
+    "language": "TypeScript",
+    "styling": "Tailwind CSS 4",
+    "deploy_target": "Vercel",
+    "optional_services": ["Supabase", "web push", "OpenAI"]
+  },
+  "important_files": [
+    "src/app/page.tsx",
+    "src/components/LiveSunsetDashboard.tsx",
+    "src/components/SunsetReportWidget.tsx",
+    "src/components/EnableNotifications.tsx",
+    "src/components/ShareLiveCard.tsx",
+    "src/components/GlobalSunsetBoard.tsx",
+    "src/components/PerfectSunsetFramework.tsx",
+    "src/app/api/live-score/route.ts",
+    "src/lib/spots.ts",
+    "src/lib/report.ts",
+    "src/lib/geo.ts",
+    "src/lib/locations.ts",
+    "src/lib/leave-now.ts",
+    "vercel.json",
+    ".gitignore"
+  ],
+  "preserve": [
+    "src/",
+    "public/",
+    "package.json",
+    "pnpm-lock.yaml",
+    "tsconfig.json",
+    "next.config.js",
+    "postcss.config.mjs",
+    "vercel.json",
+    ".env.local",
+    ".gitignore",
+    "RECOVERY_NOTES.md",
+    "AUTOBUILDER_FOUNDATION.json",
+    ".autobuilder/"
+  ],
+  "do_not": [
+    "do not deploy automatically",
+    "do not push automatically",
+    "do not use npm",
+    "do not expose raw provider errors",
+    "do not require OpenAI for the homepage",
+    "do not show blank homepage",
+    "do not expose Autobuilder details publicly",
+    "do not reintroduce homepage preferences panel",
+    "do not use premium as a spot tier unless all unions are intentionally updated"
+  ],
+  "autobuilder_strategy": {
+    "stage": "mvp",
+    "live_status": "working build",
+    "fail_class": "recovered from shadow_app_tree and data_shape_mismatch",
+    "decision": "build",
+    "top_roles": ["QA Release Manager", "Staff Engineer", "Product Designer", "Growth Marketer"],
+    "next_cycle_focus": "replace deterministic fallback approximations with real sunset, weather, place, and drive-time data while preserving fallback-safe UX"
+  },
+  "cleanup_policy": {
+    "safe_to_remove_after_validation": [
+      "node_modules",
+      ".next",
+      ".turbo",
+      ".vercel/cache",
+      "dist",
+      "build",
+      "coverage",
+      "playwright-report",
+      "test-results",
+      ".cache",
+      ".parcel-cache",
+      "*.log",
+      ".DS_Store"
+    ],
+    "preserve_before_deploy": ["pnpm-lock.yaml", ".env.local", "src/", "public/", "vercel.json"]
+  },
+  "last_recovery_summary": {
+    "date": "2026-05-06",
+    "branch": "push-test-fix",
+    "build_status": "passed",
+    "lint_status": "passed",
+    "summary": "Recovered production build target, restored SUNSETX homepage, stabilized live-score fallback JSON, aligned spot/report types, and wrote Autobuilder foundation files."
+  }
+}

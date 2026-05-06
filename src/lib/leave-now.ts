@@ -1,4 +1,4 @@
-export function parseClockTimeToday(label: string) {
+export function parseClockTimeToday(label: string): Date | null {
   const now = new Date()
   const match = label.match(/(\d{1,2}):(\d{2})\s?(AM|PM)/i)
 
@@ -18,10 +18,17 @@ export function parseClockTimeToday(label: string) {
   return date
 }
 
+interface LeaveNowStatus {
+  leaveAt: string
+  shouldLeaveNow: boolean
+  urgency: "unknown" | "now" | "soon" | "later"
+  copy: string
+}
+
 export function getLeaveNowStatus(input: {
   peakStart: string
   driveMinutes: number
-}) {
+}): LeaveNowStatus {
   const peakStartDate = parseClockTimeToday(input.peakStart)
   if (!peakStartDate) {
     return {

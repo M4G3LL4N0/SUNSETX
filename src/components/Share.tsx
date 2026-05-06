@@ -1,11 +1,15 @@
 "use client"
 
 export default function Share() {
-  const share = () => {
-    const url = window.location.origin + "/api/share"
-
-    navigator.clipboard.writeText(url)
-    alert("Share link copied!")
+  const share = async () => {
+    try {
+      const url = window.location.origin + "/api/share"
+      await navigator.clipboard.writeText(url)
+      alert("Share link copied to clipboard!")
+    } catch (error) {
+      console.error('Failed to copy share link:', error)
+      alert("Failed to copy share link. Please try again.")
+    }
   }
 
   return (

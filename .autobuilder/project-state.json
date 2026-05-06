@@ -1,0 +1,34 @@
+{
+  "status": "production_recovery_complete",
+  "build_status": "passed: pnpm build",
+  "deploy_status": "not_deployed_by_agent; ready_for_manual_vercel_prod",
+  "disk_status": "cleaned generated/cache artifacts; 491M before cleanup, 6.5M after cleanup, no files over 25M",
+  "recent_changes": [
+    "unshadowed src/app by removing root starter app tree",
+    "restored SUNSETX live dashboard as homepage",
+    "made live-score API fallback-safe and complete",
+    "aligned spot tiers and required spot fields",
+    "fixed report/widget data shape mismatch",
+    "made notifications render only when safe",
+    "passed pnpm install, pnpm lint, and pnpm build"
+  ],
+  "open_issues": [
+    "sunset timing is deterministic approximation, not real solar calculation",
+    "weather values are deterministic fallback, not provider-backed live weather",
+    "spot data is generated, not enriched from real places",
+    "drive time is estimated, not traffic-aware",
+    "global leaderboard remains a compact supporting feature, not deeply validated",
+    "push notifications require validated VAPID and server configuration"
+  ],
+  "next_actions": [
+    "stabilize live location engine",
+    "improve real spot data",
+    "add Google Maps or Places enrichment",
+    "improve share card",
+    "add daily notifications safely",
+    "compact global leaderboard",
+    "polish mobile experience",
+    "remove fallback leakage"
+  ],
+  "last_agent_notes": "QA gate passed for build/lint. Do not deploy automatically. Continue with real data enrichment while preserving deterministic fallback and no raw error leakage."
+}

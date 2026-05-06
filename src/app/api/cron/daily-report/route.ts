@@ -11,7 +11,7 @@ export async function GET() {
     ]
 
     const today = new Date().toISOString().slice(0, 10)
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sunsetx.vercel.app"
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sunsetx.vercel.app"
 
     for (const loc of trackedLocations) {
       const res = await fetch(

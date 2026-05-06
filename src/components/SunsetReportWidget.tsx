@@ -1,71 +1,6 @@
 "use client"
 
-type Spot = {
-  id?: string
-  name: string
-  address: string
-  score: number
-  spotScore: number
-  scent: number
-  smellLabel: string
-  parkingLabel: string
-  vibeLabel: string
-  bestFor: string
-  whyItWins: string
-  panoramaLabel: string
-  easeLabel: string
-  waterLabel: string
-  distanceMiles: number
-  driveMinutes: number
-  tier?: "close" | "premium" | "destination"
-}
-
-type Report = {
-  header: {
-    title: string
-    dateLabel: string
-    regionLabel: string
-    preferenceLabel: string
-    intro: string
-  }
-  summary: {
-    score: number
-    rating: string
-    worthIt: string
-    bullets: string[]
-  }
-  timing: {
-    goldenHourStart: string
-    peakWindow: string
-    sunsetOfficial: string
-    afterglow: string
-    leaveBy: string
-  }
-  whyTonightIsGood: {
-    cloudStructure: string
-    atmosphere: string
-    wind: string
-  }
-  conditions: {
-    clouds: number
-    humidity: number
-    visibility: number
-    wind: number
-    explanation: string
-  }
-  whatToExpect: string[]
-  avoid: string[]
-  spots: Spot[]
-  decision: {
-    goNoGo: string
-    bestMove: string
-  }
-  productInsight: {
-    title: string
-    combinedSignals: string[]
-    becomes: string[]
-  }
-}
+import type { Spot, SunsetReport } from "@/lib/report"
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
@@ -121,7 +56,7 @@ function SpotCard({ spot, index, label, className = "" }: {
       shadow-[0_8px_40px_-15px_rgba(139,92,246,0.2)]
       hover:shadow-[0_12px_50px_-12px_rgba(139,92,246,0.25)]
     `,
-    premium: `
+    mid: `
       bg-gradient-to-br from-amber-500/10 to-yellow-400/8
       shadow-[0_8px_40px_-15px_rgba(245,158,11,0.2)]
       hover:shadow-[0_12px_50px_-12px_rgba(245,158,11,0.25)]
@@ -141,7 +76,7 @@ function SpotCard({ spot, index, label, className = "" }: {
       rounded-2xl border border-white/15 p-3 backdrop-blur-xl
       transition-all duration-300 ease-in-out
       relative isolate overflow-hidden
-      after:absolute after:insect-0 after:rounded-2xl
+      after:absolute after:inset-0 after:rounded-2xl
       after:pointer-events-none after:bg-gradient-to-b 
       after:from-white/[0.02] after:to-white/0
       ${classes} ${className}
@@ -198,20 +133,19 @@ function SpotCard({ spot, index, label, className = "" }: {
   )
 }
 
-export default function SunsetReportWidget({ report }: { report: Report | null }) {
+export default function SunsetReportWidget({ report }: { report: SunsetReport | null }) {
   if (!report) return null
 
-  // Categorize spots for display
-  const closeSpots = report.spots.slice(0, 3)
-  const midRangeSpot = report.spots[3] || null
-  const premiumSpot = report.spots[4] || null
+  const closeSpots = report.spots.quickOptions
+  const midRangeSpot = report.spots.premiumOption
+  const destinationSpot = report.spots.destinationSpot
 
   return (
     <section className="mt-2 space-y-2">
       <div className="rounded-[24px] border border-white/[0.08] bg-gradient-to-br from-violet-400/10 via-fuchsia-400/5 to-transparent p-4 shadow-lg backdrop-blur-xl">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">Tonight's Report</div>
+            <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">Tonight&apos;s Report</div>
             <div className="text-xl font-medium text-white mb-2">{report.header.title}</div>
             <div className="flex flex-wrap gap-1.5">
               <Chip>{report.summary.rating}</Chip>
@@ -310,7 +244,6 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
         </div>
       </div>
 
-      {/* Close Spots Section */}
       {closeSpots.length > 0 && (
         <div className="space-y-2">
           <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">
@@ -322,23 +255,21 @@ export default function SunsetReportWidget({ report }: { report: Report | null }
         </div>
       )}
 
-      {/* Mid-Range Spot Section */}
       {midRangeSpot && (
         <div className="space-y-2">
           <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">
             Worth the drive (~30 min)
           </div>
-          <SpotCard spot={midRangeSpot} index={0} label="Premium option" />
+          <SpotCard spot={midRangeSpot} index={0} label="Upgraded option" />
         </div>
       )}
 
-      {/* Premium Spot Section */}
-      {premiumSpot && (
+      {destinationSpot && (
         <div className="space-y-2">
           <div className="text-[11px] uppercase tracking-wide text-zinc-500 mb-2">
             Best in region (~1 hour)
           </div>
-          <SpotCard spot={premiumSpot} index={0} label="Destination spot" />
+          <SpotCard spot={destinationSpot} index={0} label="Destination spot" />
         </div>
       )}
 

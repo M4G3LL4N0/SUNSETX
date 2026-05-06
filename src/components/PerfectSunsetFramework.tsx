@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 
-type PerfectSunsetResponse = {
+interface PerfectSunsetResponse {
   title: string
   summary: string
   bullets: string[]
@@ -16,9 +16,24 @@ export default function PerfectSunsetFramework() {
     let active = true
 
     const load = async () => {
-      const res = await fetch("/api/perfect-sunset", { cache: "no-store" })
-      const json = (await res.json()) as PerfectSunsetResponse
-      if (active) setData(json)
+      try {
+        const res = await fetch("/api/perfect-sunset", { cache: "no-store" })
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+        const json = (await res.json()) as PerfectSunsetResponse
+        if (active) setData(json)
+      } catch (error) {
+        console.error('Failed to load perfect sunset data:', error)
+        if (active) setData({
+          title: 'Sunset Insights',
+          summary: 'Unable to load live sunset data. Please try again later.',
+          bullets: [
+            'Cloud structure impacts color',
+            'Atmospheric conditions affect visibility',
+            'Wind patterns influence sky texture'
+          ],
+          updatedAt: new Date().toISOString()
+        })
+      }
     }
 
     load()

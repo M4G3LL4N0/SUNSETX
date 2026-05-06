@@ -6,18 +6,20 @@ export type GeneratedSpot = {
   id: string
   name: string
   address: string
+  lat: number
+  lon: number
   score: number
   spotScore: number
   scent: number
   smellLabel: string
   parkingLabel: string
   vibeLabel: string
-  tier?: 'close' | 'premium' | 'destination'
   bestFor: string
   whyItWins: string
   panoramaLabel: string
   easeLabel: string
   waterLabel: string
+  woodsyBias: number
   distanceMiles: number
   driveMinutes: number
   reasons: string[]
@@ -32,6 +34,8 @@ export function generateNearbySpots(lat: number, lon: number, skyScore = 82): Ge
       id: "close-1",
       name: "Nearby Hill Overlook",
       address: `Near ${lat.toFixed(3)}, ${lon.toFixed(3)}`,
+      lat: lat + 0.018,
+      lon: lon - 0.022,
       score: Math.min(99, base + 6),
       spotScore: 91,
       scent: 0.92,
@@ -43,6 +47,7 @@ export function generateNearbySpots(lat: number, lon: number, skyScore = 82): Ge
       panoramaLabel: "Open hillside panorama",
       easeLabel: "Very easy",
       waterLabel: "Low water smell risk",
+      woodsyBias: 0.92,
       distanceMiles: 3.2,
       driveMinutes: 9,
       reasons: ["elevated view", "quick access"],
@@ -52,6 +57,8 @@ export function generateNearbySpots(lat: number, lon: number, skyScore = 82): Ge
       id: "close-2",
       name: "Scenic Park Vista",
       address: `Near ${lat.toFixed(3)}, ${lon.toFixed(3)}`,
+      lat: lat + 0.024,
+      lon: lon + 0.031,
       score: Math.min(99, base + 2),
       spotScore: 87,
       scent: 0.86,
@@ -63,6 +70,7 @@ export function generateNearbySpots(lat: number, lon: number, skyScore = 82): Ge
       panoramaLabel: "Wide park-facing sky",
       easeLabel: "Easy",
       waterLabel: "Low water smell risk",
+      woodsyBias: 0.78,
       distanceMiles: 4.8,
       driveMinutes: 12,
       reasons: ["open sky", "easy parking"],
@@ -72,6 +80,8 @@ export function generateNearbySpots(lat: number, lon: number, skyScore = 82): Ge
       id: "close-3",
       name: "Bay View Point",
       address: `Near ${lat.toFixed(3)}, ${lon.toFixed(3)}`,
+      lat: lat - 0.015,
+      lon: lon - 0.041,
       score: Math.min(99, base),
       spotScore: 84,
       scent: 0.74,
@@ -83,6 +93,7 @@ export function generateNearbySpots(lat: number, lon: number, skyScore = 82): Ge
       panoramaLabel: "Open shoreline sky",
       easeLabel: "Easy",
       waterLabel: "Moderate water presence",
+      woodsyBias: 0.35,
       distanceMiles: 6.4,
       driveMinutes: 15,
       reasons: ["wide horizon", "strong reflections"],
@@ -92,6 +103,8 @@ export function generateNearbySpots(lat: number, lon: number, skyScore = 82): Ge
       id: "mid-1",
       name: "Premium Ridge Lookout",
       address: `Within 30 minutes of ${lat.toFixed(3)}, ${lon.toFixed(3)}`,
+      lat: lat + 0.11,
+      lon: lon - 0.17,
       score: Math.min(99, base + 8),
       spotScore: 93,
       scent: 0.9,
@@ -103,6 +116,7 @@ export function generateNearbySpots(lat: number, lon: number, skyScore = 82): Ge
       panoramaLabel: "High ridge panorama",
       easeLabel: "Easy to moderate",
       waterLabel: "Low water smell risk",
+      woodsyBias: 0.82,
       distanceMiles: 14.5,
       driveMinutes: 27,
       reasons: ["best within 30 min", "high elevation"],
@@ -112,6 +126,8 @@ export function generateNearbySpots(lat: number, lon: number, skyScore = 82): Ge
       id: "destination-1",
       name: "Regional Sunset Destination",
       address: `Best wider-area option from ${lat.toFixed(3)}, ${lon.toFixed(3)}`,
+      lat: lat + 0.28,
+      lon: lon - 0.46,
       score: Math.min(99, base + 10),
       spotScore: 95,
       scent: 0.88,
@@ -123,6 +139,7 @@ export function generateNearbySpots(lat: number, lon: number, skyScore = 82): Ge
       panoramaLabel: "Signature western horizon",
       easeLabel: "Moderate",
       waterLabel: "Low to moderate water presence",
+      woodsyBias: 0.74,
       distanceMiles: 34.8,
       driveMinutes: 52,
       reasons: ["regional favorite", "consistent sunsets"],

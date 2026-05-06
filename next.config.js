@@ -7,7 +7,12 @@ const nextConfig = {
     optimizePackageImports: ['@react-google-maps/api'],
   },
   images: {
-    domains: ['images.unsplash.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+    ],
   },
   turbopack: {
     root: __dirname,

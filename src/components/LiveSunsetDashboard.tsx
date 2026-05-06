@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import ShareLiveCard from "@/components/ShareLiveCard"
 import PerfectSunsetFramework from "@/components/PerfectSunsetFramework"
 import EnableNotifications from "@/components/EnableNotifications"
+import SunsetReportWidget from "@/components/SunsetReportWidget"
 import { generateSunsetReport } from "@/lib/report"
 import { getLeaveNowStatus } from "@/lib/leave-now"
 
@@ -15,11 +16,11 @@ type LeaveNowStatus = {
 }
 
 type NearbySpot = {
-  id?: string
+  id: string
   name: string
   address: string
-  lat?: number
-  lon?: number
+  lat: number
+  lon: number
   score: number
   spotScore: number
   scent: number
@@ -31,11 +32,11 @@ type NearbySpot = {
   panoramaLabel: string
   easeLabel: string
   waterLabel: string
-  woodsyBias?: number
+  woodsyBias: number
   distanceMiles: number
   driveMinutes: number
-  reasons?: string[]
-  tier?: "close" | "mid" | "destination"
+  reasons: string[]
+  tier: "close" | "mid" | "destination"
 }
 
 type ApiResponse = {
@@ -123,6 +124,8 @@ function buildEmergencyData(coords: { lat: number; lon: number }): ApiResponse {
         id: "fallback-1",
         name: "Nearby Scenic Spot",
         address: "Live location fallback",
+        lat: coords.lat + 0.018,
+        lon: coords.lon - 0.022,
         score: 91,
         spotScore: 91,
         scent: 0.95,
@@ -134,14 +137,18 @@ function buildEmergencyData(coords: { lat: number; lon: number }): ApiResponse {
         panoramaLabel: "Open horizon",
         easeLabel: "Very easy",
         waterLabel: "Low water smell risk",
+        woodsyBias: 0.84,
         distanceMiles: 3.4,
         driveMinutes: 9,
+        reasons: ["quick access", "open western sky"],
         tier: "close",
       },
       {
         id: "fallback-2",
         name: "Hillside Overlook",
         address: "Live location fallback",
+        lat: coords.lat + 0.11,
+        lon: coords.lon - 0.17,
         score: 88,
         spotScore: 88,
         scent: 0.9,
@@ -153,14 +160,18 @@ function buildEmergencyData(coords: { lat: number; lon: number }): ApiResponse {
         panoramaLabel: "High hillside panorama",
         easeLabel: "Easy",
         waterLabel: "Low water smell risk",
+        woodsyBias: 0.88,
         distanceMiles: 4.8,
         driveMinutes: 11,
+        reasons: ["higher elevation", "cleaner air"],
         tier: "mid",
       },
       {
         id: "fallback-3",
         name: "Open Bay View",
         address: "Live location fallback",
+        lat: coords.lat + 0.28,
+        lon: coords.lon - 0.46,
         score: 84,
         spotScore: 84,
         scent: 0.75,
@@ -172,8 +183,10 @@ function buildEmergencyData(coords: { lat: number; lon: number }): ApiResponse {
         panoramaLabel: "Open shoreline sky",
         easeLabel: "Very easy",
         waterLabel: "Moderate water presence",
+        woodsyBias: 0.36,
         distanceMiles: 2.9,
         driveMinutes: 8,
+        reasons: ["wide horizon", "afterglow reflections"],
         tier: "destination",
       },
     ],
@@ -302,11 +315,15 @@ export default function LiveSunsetDashboard() {
 
   useEffect(() => {
     let active = true
+    const requestCoords = {
+      lat: coords.lat,
+      lon: coords.lon,
+    }
 
     async function load() {
       try {
         const res = await fetch(
-          `/api/live-score?lat=${coords.lat}&lon=${coords.lon}&userKey=${encodeURIComponent(userKey)}`,
+          `/api/live-score?lat=${requestCoords.lat}&lon=${requestCoords.lon}&userKey=${encodeURIComponent(userKey)}`,
           { cache: "no-store" }
         )
         const json = await res.json()
@@ -321,7 +338,7 @@ export default function LiveSunsetDashboard() {
         }
       } catch {
         if (active) {
-          setData(buildEmergencyData(coords))
+          setData(buildEmergencyData(requestCoords))
           setFallbackMode(true)
         }
       }
@@ -385,8 +402,8 @@ export default function LiveSunsetDashboard() {
           </h1>
 
           <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-300 md:text-base">
-            Every visitor sees a location-aware sunset report with nearby spots, timing intelligence,
-            premium narrative guidance, and a clear go / no-go decision.
+            A compact decision board for tonight: score, peak window, leave timing,
+            nearby spots, afterglow, and the best move.
           </p>
 
           <div className="mt-5 flex flex-wrap gap-2">
@@ -471,6 +488,8 @@ export default function LiveSunsetDashboard() {
           </div>
         </div>
       </div>
+
+      <SunsetReportWidget report={report} />
 
       <PerfectSunsetFramework />
     </section>

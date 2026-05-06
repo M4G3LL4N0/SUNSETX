@@ -45,7 +45,7 @@ function Section({ title, items, compact = false }: SectionProps & { compact?: b
         {!compact && <div className="text-[12px] text-zinc-500">SCORE</div>}
       </div>
       <div className="space-y-2">
-        {items.map((item, index) => (
+        {items.map((item) => (
           <div
             key={`${title}-${item.city}-${item.country}`}
             className={`rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 hover:bg-white/[0.04] transition-colors ${
