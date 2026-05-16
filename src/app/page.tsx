@@ -23,21 +23,29 @@ export default function Home() {
         </div>
 
         <div className="space-y-5">
-          <ClientSafeBoundary fallbackTitle="Live sunset dashboard">
-            <LiveSunsetDashboard />
-          </ClientSafeBoundary>
+          <div id="live" className="scroll-mt-20">
+            <ClientSafeBoundary fallbackTitle="Live sunset dashboard">
+              <LiveSunsetDashboard />
+            </ClientSafeBoundary>
+          </div>
 
-          <ClientSafeBoundary fallbackTitle="Sunset education">
-            <EducationRotator />
-          </ClientSafeBoundary>
+          <div id="education" className="scroll-mt-20">
+            <ClientSafeBoundary fallbackTitle="Sunset education">
+              <EducationRotator />
+            </ClientSafeBoundary>
+          </div>
 
-          <ClientSafeBoundary fallbackTitle="Global sunset board">
-            <GlobalSunsetBoard />
-          </ClientSafeBoundary>
+          <div id="board" className="scroll-mt-20">
+            <ClientSafeBoundary fallbackTitle="Global sunset board">
+              <GlobalSunsetBoard />
+            </ClientSafeBoundary>
+          </div>
 
-          <ClientSafeBoundary fallbackTitle="Perfect sunset framework">
-            <PerfectSunsetFramework />
-          </ClientSafeBoundary>
+          <div id="framework" className="scroll-mt-20">
+            <ClientSafeBoundary fallbackTitle="Perfect sunset framework">
+              <PerfectSunsetFramework />
+            </ClientSafeBoundary>
+          </div>
         </div>
       </div>
     </main>

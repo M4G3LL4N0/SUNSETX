@@ -2,6 +2,7 @@ import "./globals.css"
 import { Inter } from 'next/font/google'
 import type { Metadata, Viewport } from "next"
 import React from "react"
+import SiteNav from "@/components/SiteNav"
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className={inter.className}>
       <body className="min-h-screen bg-black text-white">
+        <SiteNav />
         {children}
       </body>
     </html>
