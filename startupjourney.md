@@ -15,6 +15,10 @@
 - GitHub push status: See loop entry below
 - Last updated: 2026-05-16
 
+- Overall reality label: **VERIFIED (local build) + DEMO (product flows)**
+- Launch readiness: **NOT READY**
+- Proof ladder level: **4 — Local build proof**
+
 ## 2. Portfolio Score
 - Product clarity: 8 → 8
 - MVP reality: 9 → 9
@@ -206,6 +210,16 @@ Based on https://sunsetx.noaerth.com:
 - What improved: Mobile nav, scroll lock, trust copy
 - What still needs work: Label demo vs live API data on dashboard cards
 
+
+### Loop Entry: 2026-05-16 (Apex)
+- Primary mode: MODE X
+- Loop type: LOOP 22
+- Changes made: LOCAL_REVIEW checklist
+- Files changed: LOCAL_REVIEW.md
+- Build result: PASS (verify this loop)
+- Tests run: `pnpm build`
+- Local review: see LOCAL_REVIEW.md
+
 ## 13. Next Loop Plan
 - Highest leverage next move: Label demo vs live API data on dashboard cards
 - Product: Deeper demo state
@@ -251,3 +265,54 @@ Based on https://sunsetx.noaerth.com:
 - Architecture: API boundary docs
 - Sales/outreach: Founder-led
 - Content engine: Launch posts
+
+## 11. Risk Register
+- **Unsupported live metrics:** Likelihood: medium | Impact: high | Evidence: marketing copy | Mitigation: demo labels + disclaimers | Review: each loop
+- **Regulated domain framing:** Likelihood: low–medium | Impact: high | Evidence: product category | Mitigation:  | Review: before public launch
+- **Git remote confusion:** Likelihood: medium | Impact: medium | Evidence: prior pushes to wrong repo | Mitigation: scoped commits only | Review: before push
+
+## Work completed this loop
+### Portfolio loop (2026-05-16)
+
+- Graphics kit, TrustStrip, SubpageVisual, LOCAL_REVIEW, PROOF_LOOP in place.
+- Build status: see `.noaerth_full_build_status.tsv` at portfolio root.
+- Claim level: DEMO for public metrics unless marked PROVEN below.
+
+
+## 8. Work Completed This Loop (Hyperion v6 — 2026-05-18)
+- Mode: REALITY LABELS + portfolio memory
+- Build matrix: **PASS** (portfolio TSV)
+- Reality labels: snapshot + evidence map normalized
+- Git: see per-project safe commit
+
+## 8. Work Completed This Loop (BlackDiamond v7 — 2026-05-18)
+- Mode: CLAIM REGISTER + FAILURE REGISTER
+- Build matrix: **PASS** (portfolio TSV)
+- Claim register: created/updated
+- Failure register: created/updated
+- Launch gate: LOCAL REVIEW READY if build PASS (not PUBLIC READY)
+- Git: see per-project safe commit
+
+## 8. Work Completed This Loop (EverestKernel v8 — 2026-05-18)
+- Mode: LAUNCH READINESS + REVIEW QUEUE
+- LAUNCH_READINESS.md: installed/updated
+- Build matrix: **PASS**
+- Launch gate: **NOT READY**
+- Review queue: see NOAERTH_REVIEW_QUEUE.md if P1 demo project
+- Deployment: none
+
+## 8. Work Completed This Loop (SovereignCompiler v9 — 2026-05-18)
+- Mode: DECISION RECORD + launch governance
+- DECISION_RECORD.md: installed/updated
+- Build matrix: **PASS** (TSV; spot-build after code changes)
+- AI boundary: no deploy, no vercel --prod
+
+## 8. Work Completed This Loop (SingularityForge v11 — 2026-05-18)
+- Mode: PROOF LADDER + claim safety batch
+- Proof ladder: **4 — Local build proof**
+- Build matrix: **PASS** (TSV; spot-build after code changes)
+- No deploy
+
+## TitanAtlas v13 patch (2026-05-18)
+- Scored total: 58/100 · stage: static demo · priority: P2
+- Recommended action: create MVP surface (/demo)

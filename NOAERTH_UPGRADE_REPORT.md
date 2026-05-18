@@ -44,3 +44,19 @@ origin https://github.com/M4G3LL4N0/sunsetx.git
 
 ## Next steps
 Label demo vs live API data on dashboard cards
+
+---
+# NOAERTH Upgrade Report — SUNSETX
+
+**Apex pass:** 2026-05-16
+
+## Summary
+LOCAL_REVIEW checklist
+
+## Local review
+See LOCAL_REVIEW.md
+
+## Build
+Run `pnpm build` after pull.
+
+**No deployment.**

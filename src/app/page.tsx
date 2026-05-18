@@ -1,3 +1,7 @@
+import { TrustStrip } from "@/components/TrustStrip";
+import { MarketingGraphicsStack } from "@/components/MarketingGraphicsStack";
+import { ProcessFlowSection } from "@/components/ProcessFlowSection";
+import { HeroProductPanel } from "@/components/HeroProductPanel";
 import ClientSafeBoundary from "@/components/ClientSafeBoundary"
 import EducationRotator from "@/components/EducationRotator"
 import GlobalSunsetBoard from "@/components/GlobalSunsetBoard"
@@ -10,6 +14,10 @@ export const revalidate = 0
 export default function Home() {
   return (
     <main className="min-h-screen bg-black text-white">
+        <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
+          <TrustStrip />
+        </div>
+
       <div className="fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute left-[-10%] top-[-10%] h-[420px] w-[420px] rounded-full bg-fuchsia-500/20 blur-3xl" />
         <div className="absolute right-[-8%] top-[8%] h-[360px] w-[360px] rounded-full bg-sky-500/20 blur-3xl" />
@@ -48,6 +56,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <section className="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6"><HeroProductPanel /></section>
+      <ProcessFlowSection />
+    <MarketingGraphicsStack />
     </main>
   )
 }
